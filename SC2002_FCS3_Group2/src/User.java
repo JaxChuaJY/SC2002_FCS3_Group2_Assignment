@@ -7,12 +7,12 @@ public abstract class User {
 	private MaritalStatus maritalStatus;
 	//private SearchFilter filterSetting (?) - What are we implementing here? I'm a bit lost.
 	
-	public User(String name, String password, int age, String nric, MaritalStatus maritalstatus) {
+	public User(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
 		this.Name = name;
-		this.Password = password;
-		this.Age = age;
 		this.NRIC = nric;
+		this.Age = age;
 		this.maritalStatus = maritalstatus;
+		this.Password = password;
 	}
 	
 	public void changePassword(String newPassword) {
@@ -25,5 +25,9 @@ public abstract class User {
 
 	public MaritalStatus getMaritalStatus(){
 		return this.maritalStatus;
+	}
+	
+	public String toString() {
+		return Name; //To be Added
 	}
 }
