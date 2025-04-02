@@ -5,6 +5,6 @@ public class Applicant extends User{
 	
 	public Applicant(String name, String password, int age, 
 			String nric, MaritalStatus maritalstatus){
-		super(nric, nric, age, nric, maritalstatus);
+		super(name, password, age, nric, maritalstatus);
 	}
 }
