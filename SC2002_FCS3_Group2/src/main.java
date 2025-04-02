@@ -17,6 +17,8 @@ public class main {
 		
 	}
 	
+	
+	//If it violates any design principles, please help to shift it.
 	static List<User> setUpUser() {
 		
 		List<User> userList = new ArrayList<User>();
@@ -35,6 +37,8 @@ public class main {
 		return userList;
 		
 	}
+	
+	//If it violates any design principles, please help to shift it.
 	static User createUserFromFile(String file, String[] values) {
 		
 	    String name = values[0];
