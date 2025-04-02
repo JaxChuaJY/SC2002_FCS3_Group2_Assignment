@@ -1,7 +1,7 @@
 
 public abstract class User {
 	private String Name;
-	private String Password = "password";	
+	private String Password;	
 	private int Age;
 	private String NRIC;
 	private MaritalStatus maritalStatus;
@@ -21,5 +21,9 @@ public abstract class User {
 	
 	public boolean login(String nric, String password) {
 		return this.NRIC == nric.toUpperCase() && this.Password == password;
+	}
+
+	public MaritalStatus getMaritalStatus(){
+		return this.maritalStatus;
 	}
 }
