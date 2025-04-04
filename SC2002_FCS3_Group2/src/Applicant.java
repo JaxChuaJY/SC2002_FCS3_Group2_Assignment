@@ -1,7 +1,7 @@
 
 public class Applicant extends User{
 	
-	//private Application application;
+	private Application application;
 	
 	public Applicant(String name, String nric, int age, 
 			MaritalStatus maritalstatus, String password){
