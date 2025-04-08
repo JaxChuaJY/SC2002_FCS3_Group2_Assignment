@@ -1,3 +1,5 @@
+package user;
+import enums.MaritalStatus;
 
 public class Applicant extends User{
 	

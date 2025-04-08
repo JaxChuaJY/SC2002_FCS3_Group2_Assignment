@@ -1,3 +1,5 @@
+package user;
+import enums.MaritalStatus;
 
 public abstract class User {
 	private String Name;

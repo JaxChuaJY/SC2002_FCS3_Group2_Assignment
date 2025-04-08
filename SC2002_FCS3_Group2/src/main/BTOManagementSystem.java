@@ -1,4 +1,10 @@
+package main;
 import java.util.List;
+
+import enums.MaritalStatus;
+import user.Applicant;
+import user.ApplicationManager;
+import user.User;
 
 public class BTOManagementSystem {
 	//private List<Project> projectList;

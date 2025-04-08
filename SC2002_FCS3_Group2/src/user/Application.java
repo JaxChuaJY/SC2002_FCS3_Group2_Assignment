@@ -1,3 +1,6 @@
+package user;
+import enums.ApplicationStatus;
+import enums.FlatType;
 
 public class Application {
 	
