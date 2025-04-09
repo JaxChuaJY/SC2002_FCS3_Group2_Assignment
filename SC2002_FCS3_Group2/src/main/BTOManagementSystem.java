@@ -1,54 +1,29 @@
 package main;
-import java.util.List;
 
-import enums.MaritalStatus;
-import user.Applicant;
-import user.ApplicationManager;
+import application.ApplicationManager;
 import user.User;
+import user.UserManager;
 
 public class BTOManagementSystem {
 	//private List<Project> projectList;
-	private List<User> userList;
+	private UserManager userManager;
 	private ApplicationManager applicationManager;
+	private MenuManager menuManager;
 	
-	BTOManagementSystem(){}
-	
-	public void initUser(String filePath) {
-		List<User> userGroup = FileHandler.readFromFile(filePath).stream()
-				.skip(1)
-				.map(entry -> {
-					String[] values = entry.split(",");
-						return createUserFromFile(filePath,values);
-						})
-					.filter(user -> user != null)
-					.toList();
-		this.userList.addAll(userGroup);
+	BTOManagementSystem(){
+		this.userManager = new UserManager();
 	}
 	
-	static User createUserFromFile(String file, String[] values) {
+	public void startSystem() {
+		this.userManager.initializeFromCSV();
 		
-	    String name = values[0];
-	    String nric = values[1];
-	    int age = Integer.valueOf(values[2]);
-	    MaritalStatus status = MaritalStatus.valueOf(values[3].toUpperCase());
-	    String password = values[4];
-
-	    switch(file) {
-	        case "data/ApplicantList.csv":
-	            return new Applicant(name, nric, age, status, password);
-	        /*case "data/ManagerList.csv":
-	            return new HDBManager(name, nric, age, status, password);
-	        case "data/OfficerList.csv":
-	            return new HDBOfficer(name, nric, age, status, password);*/
-	        default:
-	            System.out.println("Invalid File");
-	            return null;
-	    }
+		User user = userManager.loginUser();
+        if (user != null) {
+            menuManager.setCurrentUser(user);
+            menuManager.displayMenu();
+        } else {
+            System.out.println("Login failed. Exiting system.");
+        }
 	}
-	public User loginUser(String nric, String password) {
-		return userList.stream()
-				.filter(entry -> entry.login(nric, password)==true)
-				.findFirst()
-				.orElse(null);
-	}
+	
 }
