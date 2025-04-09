@@ -1,12 +1,12 @@
 package user;
-import java.util.List;
-
 import application.Application;
+import enums.ApplicationStatus;
+import enums.FlatType;
 import enums.MaritalStatus;
-import interfaces.IProjectViewer;
+import interfaces.IApplicantAction;
 import project.Project;
 
-public class Applicant extends User implements IProjectViewer{
+public class Applicant extends User implements IApplicantAction{
 	
 	private Application application;
 	
@@ -16,12 +16,23 @@ public class Applicant extends User implements IProjectViewer{
 	}
 	
 	@Override
-	public List<Project> viewProject(List<Project> projectList) {
-		return projectList.stream()
-				.filter(project -> 
-						getMaritalStatus().canView(project.getFlatType(), getAge()))
-		        .toList();
+	public void removeApplication() {
+		this.application = null;
 	}
 
-	
+	@Override
+	public void applyForProject(Application a) {
+		this.application = a;
+		
+	}
+
+	@Override
+	public void withdrawApplication() {
+		this.application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
+	}
+
+	@Override
+	public String viewApplicationStatus() {
+		return this.application.getStatus().toString();	
+	}
 }

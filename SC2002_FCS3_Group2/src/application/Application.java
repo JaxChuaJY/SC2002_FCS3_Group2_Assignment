@@ -22,4 +22,26 @@ public class Application {
 		this.status = status;
 	}
 	
+	public void viewProject() {
+		System.out.print(project);
+	}
+	
+	public Project getProject() {
+		return this.project;
+	}
+	
+	public Applicant getApplicant() {
+		return this.applicant;
+	}
+	
+	public ApplicationStatus getStatus() {
+		return this.status;
+	}
+	
+	public String toString() {
+		return "NRIC: " + applicant.getNric() +
+				"\nProject" + project.getProjectName() +
+				"\nFlat Type:" + flatType.toString() +
+				"\nStatus: " + status.toString();
+	}
 }

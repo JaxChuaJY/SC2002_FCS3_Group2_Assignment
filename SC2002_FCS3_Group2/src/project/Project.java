@@ -45,11 +45,14 @@ public class Project {
 	public LocalDate getClosingDate() {
 		return closingDate;
 	}
-	public int getOfficarSlots() {
+	public int getOfficrSlots() {
 		return officerSlots;
 	}
 	public String getManagerName() {
 		return manager.getName();
+	}
+	public boolean getVisibility() {
+		return isVisible;
 	}
 	public void printOfficerList() {
 		for (HDBOfficer officer : officerList) {
@@ -58,5 +61,11 @@ public class Project {
 	}
 	public void toggleVisibility() {
 		isVisible = !isVisible;
+	}
+	
+	public String toString() {
+		return "Project: " + projectName
+			     + "\nNeighbourhood: " + neighbourhood
+			     + "\nFlat Supply: " + flatSupply.toString();
 	}
 }

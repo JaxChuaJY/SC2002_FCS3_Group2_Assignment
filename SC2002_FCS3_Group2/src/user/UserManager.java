@@ -83,4 +83,11 @@ public class UserManager {
 			.filter(entry -> entry.getNric().equals(nric.toUpperCase()))
 			.toList().getFirst().changePassword(password);
 	}
+	
+	public User getUser(String nric) {
+		return userList.stream()
+				.filter(entry -> entry.getNric().equals(nric.toUpperCase()))
+				.findAny()
+				.orElse(null);
+	}
 }
