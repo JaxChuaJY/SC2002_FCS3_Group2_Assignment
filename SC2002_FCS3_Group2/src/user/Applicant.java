@@ -1,7 +1,12 @@
 package user;
-import enums.MaritalStatus;
+import java.util.List;
 
-public class Applicant extends User{
+import application.Application;
+import enums.MaritalStatus;
+import interfaces.IProjectViewer;
+import project.Project;
+
+public class Applicant extends User implements IProjectViewer{
 	
 	private Application application;
 	
@@ -9,4 +14,14 @@ public class Applicant extends User{
 			MaritalStatus maritalstatus, String password){
 		super(name, nric, age, maritalstatus, password);
 	}
+	
+	@Override
+	public List<Project> viewProject(List<Project> projectList) {
+		return projectList.stream()
+				.filter(project -> 
+						getMaritalStatus().canView(project.getFlatType(), getAge()))
+		        .toList();
+	}
+
+	
 }

@@ -1,6 +1,8 @@
-package user;
+package application;
 import enums.ApplicationStatus;
 import enums.FlatType;
+import project.Project;
+import user.Applicant;
 
 public class Application {
 	
