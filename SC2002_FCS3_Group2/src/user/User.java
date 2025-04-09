@@ -1,7 +1,11 @@
 package user;
-import enums.MaritalStatus;
+import java.util.List;
 
-public abstract class User {
+import enums.MaritalStatus;
+import interfaces.IProjectViewer;
+import project.Project;
+
+public abstract class User implements IProjectViewer{
 	private String Name;
 	private String Password;	
 	private int Age;
@@ -22,14 +26,22 @@ public abstract class User {
 	}
 	
 	public boolean login(String nric, String password) {
-		return this.NRIC == nric.toUpperCase() && this.Password == password;
+		return this.NRIC.equals(nric) && this.Password.equals(password);
 	}
 
-	public MaritalStatus getMaritalStatus(){
-		return this.maritalStatus;
-	}
+	public MaritalStatus getMaritalStatus(){ return this.maritalStatus; }
+	
+	public String getNric() { return this.NRIC; }
+
+	public int getAge() { return this.Age; }
 	
 	public String toString() {
-		return Name; //To be Added
+		return "name: " + Name + "; NRIC: " + NRIC + "; Password: " + Password; //To be Added
 	}
+	
+	@Override
+	public List<Project> viewProject(List<Project> projectList) {
+		throw new UnsupportedOperationException("Subclasses must implement viewProjects()");
+	}
+
 }
