@@ -1,10 +1,9 @@
 package user;
 import application.Application;
+import application.ApplicationManager;
 import enums.ApplicationStatus;
-import enums.FlatType;
 import enums.MaritalStatus;
 import interfaces.IApplicantAction;
-import project.Project;
 
 public class Applicant extends User implements IApplicantAction{
 	
@@ -27,7 +26,12 @@ public class Applicant extends User implements IApplicantAction{
 	}
 
 	@Override
-	public void withdrawApplication() {
+	public void withdrawApplication(ApplicationManager aM) {
+		aM.getApplicationList().values().forEach(set -> 
+        set.stream()
+        	.filter(application -> application.getApplicant().equals(this))
+        	.forEach(application -> application.setStatus(ApplicationStatus.WITHDRAW_REQUEST)));
+		System.out.println("Application withdrawn request successful.");
 		this.application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
 	}
 
