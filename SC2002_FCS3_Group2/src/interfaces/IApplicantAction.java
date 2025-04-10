@@ -1,10 +1,11 @@
 package interfaces;
 
 import application.Application;
+import application.ApplicationManager;
 
 public interface IApplicantAction {
-	void withdrawApplication();
 	String viewApplicationStatus();
 	void applyForProject(Application a);
 	void removeApplication();
+	void withdrawApplication(ApplicationManager aM);
 }

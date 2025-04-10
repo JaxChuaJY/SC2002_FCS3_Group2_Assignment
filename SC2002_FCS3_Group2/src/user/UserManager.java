@@ -2,12 +2,16 @@ package user;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
+import enums.FlatType;
 import enums.MaritalStatus;
+import interfaces.IUserManager;
 import main.FileHandler;
 
-public class UserManager {
+public class UserManager implements IUserManager{
 	
 	private static final String[] USER_FILES = {"data/ApplicantList.csv"};//,"data/ManagerList.csv","data/OfficerList.csv"};
 	private Scanner sc;
@@ -17,22 +21,20 @@ public class UserManager {
 	public UserManager(){
 		this.sc = new Scanner(System.in);
 		this.userList = new ArrayList<>();
+		loadUsersFromCSV();
 		
 	}
-	public void initializeFromCSV() {
+	private void loadUsersFromCSV() {
 		for (String filePath : USER_FILES) {
 			FileHandler.readFromFile(filePath).stream()
 				.skip(1)
-				.map(entry -> {
-					String[] values = entry.split(",");
-						return createUserFromFile(filePath,values);
-						})
-				.filter(user -> user != null)
-				.forEach(user -> userList.add(user));
+				.map(entry -> createUserFromFile(filePath, entry.split(",")))
+				.filter(Objects::nonNull)
+				.forEach(userList::add);
 		}
 	}
 	
-	User createUserFromFile(String file, String[] values) {
+	private User createUserFromFile(String file, String[] values) {
 		
 	    String name = values[0];
 	    String nric = values[1];
@@ -52,6 +54,8 @@ public class UserManager {
 	            return null;
 	    }
 	}
+	
+	@Override
 	public User loginUser() {
 		try {
 			
@@ -78,12 +82,14 @@ public class UserManager {
 		}
 	}
 	
+	@Override
 	public void changePassword(String nric, String password) {
 		userList.stream()
 			.filter(entry -> entry.getNric().equals(nric.toUpperCase()))
 			.toList().getFirst().changePassword(password);
 	}
 	
+	@Override
 	public User getUser(String nric) {
 		return userList.stream()
 				.filter(entry -> entry.getNric().equals(nric.toUpperCase()))
@@ -91,3 +97,5 @@ public class UserManager {
 				.orElse(null);
 	}
 }
+
+
