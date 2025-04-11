@@ -25,9 +25,6 @@ public class Application {
      * @throws IllegalArgumentException if any parameter is null
      */
     public Application(Applicant applicant, Project project, FlatType flatType, ApplicationStatus status) {
-        if (applicant == null || project == null || flatType == null || status == null) {
-            throw new IllegalArgumentException("Application parameters cannot be null.");
-        }
         this.applicant = applicant;
         this.project = project;
         this.flatType = flatType;

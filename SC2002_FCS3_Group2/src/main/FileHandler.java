@@ -3,9 +3,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileHandler {
+import interfaces.IFileHandler;
 
-    public static void writeToFile(String filename, List<String> data) {
+public class FileHandler implements IFileHandler{
+
+	@Override
+    public void writeToFile(String filename, List<String> data) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
             for (String line : data) {
                 bw.write(line);
@@ -17,7 +20,8 @@ public class FileHandler {
     }
 
     // Generic method to read a file and return a list of strings
-    public static List<String> readFromFile(String filename) {
+	@Override
+    public List<String> readFromFile(String filename) {
         List<String> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;

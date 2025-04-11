@@ -13,6 +13,7 @@ import enums.ApplicationStatus;
 import enums.FlatType;
 import enums.MaritalStatus;
 import interfaces.IApplicationManager;
+import interfaces.IFileHandler;
 import interfaces.IProjectManager;
 import interfaces.IUserManager;
 import main.FileHandler;
@@ -36,6 +37,7 @@ public class ApplicationManager implements IApplicationManager {
 	
 	private final IProjectManager projectManager;
     private final IUserManager userManager;
+    private final IFileHandler fileHandler;
     
 	private static final String APPLICATIONS_FILE = "data/Applications.csv";
 	
@@ -47,12 +49,10 @@ public class ApplicationManager implements IApplicationManager {
      * @param fileHandler    the file handler to read application data from CSV
      * @throws IllegalArgumentException if any of the parameters are null
      */
-	public ApplicationManager(IProjectManager projectManager, IUserManager userManager) {
-		if (projectManager == null || userManager == null) {
-            throw new IllegalArgumentException("Dependencies cannot be null.");
-        }
+	public ApplicationManager(IProjectManager projectManager, IUserManager userManager, IFileHandler fH) {
         this.projectManager = projectManager;
         this.userManager = userManager;
+        this.fileHandler = fH;
         this.applicationList = new HashMap<>();
         loadApplicationFromCSV();
     }
@@ -63,7 +63,7 @@ public class ApplicationManager implements IApplicationManager {
      */
 	@Override
 	public void loadApplicationFromCSV() {
-		FileHandler.readFromFile(APPLICATIONS_FILE).stream()
+		fileHandler.readFromFile(APPLICATIONS_FILE).stream()
 			.skip(1)
 			.map(entry -> entry.split(","))
 	        .map(this::createApplicationFromFile)

@@ -8,25 +8,26 @@ import java.util.Scanner;
 
 import enums.FlatType;
 import enums.MaritalStatus;
+import interfaces.IFileHandler;
 import interfaces.IUserManager;
 import main.FileHandler;
 
 public class UserManager implements IUserManager{
 	
 	private static final String[] USER_FILES = {"data/ApplicantList.csv"};//,"data/ManagerList.csv","data/OfficerList.csv"};
-	private Scanner sc;
+	private final IFileHandler fileHandler;
 
 	private List<User> userList;
 	
-	public UserManager(){
-		this.sc = new Scanner(System.in);
-		this.userList = new ArrayList<>();
+	public UserManager(IFileHandler fH){
+		userList = new ArrayList<>();
+		fileHandler = fH;
 		loadUsersFromCSV();
 		
 	}
 	private void loadUsersFromCSV() {
 		for (String filePath : USER_FILES) {
-			FileHandler.readFromFile(filePath).stream()
+			fileHandler.readFromFile(filePath).stream()
 				.skip(1)
 				.map(entry -> createUserFromFile(filePath, entry.split(",")))
 				.filter(Objects::nonNull)
@@ -56,30 +57,18 @@ public class UserManager implements IUserManager{
 	}
 	
 	@Override
-	public User loginUser() {
-		try {
-			
-			System.out.print("Enter ID: ");
-	        String nric = sc.nextLine().trim();
-	
-	        System.out.print("Enter password: ");
-	        String password = sc.nextLine().trim();
-			
-			User user =  userList.stream()
-				.filter(entry -> entry.login(nric, password))
-				.findAny()
-				.orElse(null);
-			
-			if (user == null) {
-				System.out.println("Login failed: Invalid ID or password");
-				return null;
-		    }
-			
-		    return user;
-		    
-		} catch (Exception e) {
-			return loginUser();
-		}
+	public User loginUser(String nric, String password) {
+		
+		User user =  userList.stream()
+			.filter(entry -> entry.login(nric, password))
+			.findAny()
+			.orElse(null);
+		
+		if (user == null) {
+			throw new IllegalArgumentException("Login failed: Invalid ID or password");
+	    }
+		
+	    return user;
 	}
 	
 	@Override
