@@ -47,7 +47,6 @@ public class ApplicationManager implements IApplicationManager {
      * @param projectManager the project manager to access project data
      * @param userManager    the user manager to access user data
      * @param fileHandler    the file handler to read application data from CSV
-     * @throws IllegalArgumentException if any of the parameters are null
      */
 	public ApplicationManager(IProjectManager projectManager, IUserManager userManager, IFileHandler fH) {
         this.projectManager = projectManager;
@@ -214,15 +213,11 @@ public class ApplicationManager implements IApplicationManager {
      */
 	@Override
 	public boolean requestWithdrawal(User user) {
-		if (user instanceof HDBManager) {
-			System.out.println("Invalid user.");
-			return false;
+		if (user instanceof Applicant applicant) {
+			applicant.withdrawApplication(this);
+			return true;
 		}
-		
-		Applicant applicant = (Applicant) user;
-		applicant.withdrawApplication(this);
-		return true;
-		
+		return false;
 	}
 	
 }
