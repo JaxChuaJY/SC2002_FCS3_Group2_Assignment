@@ -3,6 +3,8 @@ import java.util.List;
 
 import enums.MaritalStatus;
 import project.Project;
+import user.FilterSettings;
+
 
 public abstract class User{
 	private String Name;
@@ -10,6 +12,8 @@ public abstract class User{
 	private int Age;
 	private String NRIC;
 	private MaritalStatus maritalStatus;
+	private FilterSettings filters;
+
 	//private SearchFilter filterSetting (?) - What are we implementing here? I'm a bit lost.
 	
 	public User(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
@@ -18,6 +22,7 @@ public abstract class User{
 		this.Age = age;
 		this.maritalStatus = maritalstatus;
 		this.Password = password;
+		this.filters = new FilterSettings();
 	}
 	
 	public void changePassword(String newPassword) {
@@ -36,6 +41,14 @@ public abstract class User{
 	
 	public String toString() {
 		return "name: " + Name + "; NRIC: " + NRIC + "; Password: " + Password; //To be Added
+	}
+	
+	public FilterSettings getFilters() {
+	    return this.filters;
+	}
+
+	public void setFilters(FilterSettings filters) {
+	    this.filters = filters;
 	}
 
 }

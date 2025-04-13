@@ -28,6 +28,9 @@ public class Project {
 	public String getNeighbourhood() {
 		return neighbourhood;
 	}
+	public Set<FlatType> getFlatTypes() {         // For filtering
+	    return flatSupply.keySet();
+	}
 	public void printFlatSupply() {									//Do we need a getFlatSupply()?
 		System.out.print("Flat Types and available units:");
 		if (flatSupply.isEmpty()) {
