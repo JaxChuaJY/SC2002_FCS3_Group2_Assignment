@@ -1,0 +1,66 @@
+// Interface for MENU?
+		/*
+		 * -> APPLICANT 
+		 * Options: 
+		 * 1. Change Password 
+		 * 2. View Projects 
+		 * 		-List of Projects w/ filtered (due to role) 
+		 * 		-Details of certain projects ->Apply for Project 
+		 * 3. View Application 
+		 * 		-Book [Successful Application] 
+		 * 4. Enquires menu 
+		 * 		-View current enquires 
+		 * 		-Create enquire
+		 * 
+		 * 
+		 * -> HDB OFFICER Options: 
+		 * 1. Change Password 
+		 * 2. Projects 
+		 * 		-List of Projects w/ filtered (due to role?) 
+		 * 		-Details of certain projects 
+		 * 			->Apply for Project
+		 * 			->Register 
+		 * 3. View Application 
+		 * 		-Book [Successful Application] (SELF) 
+		 * 		-View Registered Project Applications 
+		 * 			->Help Applicant book 
+		 * 			->Print receipt 
+		 * 4. Enquires menu 
+		 * 		-View current enquires 
+		 * 		-Create enquire 
+		 * 		-Reply enquires 
+		 * 5. Registration 
+		 * 		-View registration status 
+		 * 		-View currently registered project
+		 * 
+		 * 
+		 * -> HDB MANAGER 
+		 * Options: 
+		 * 1. Change Password 
+		 * 2. Projects -List of Projects w/ certain Filters 
+		 * 		-Details of certain projects 
+		 * 			->Apply for Project 
+		 * 			->Register
+		 * 		-Create/Edit/Delete 
+		 * 			->Has toggle
+		 * 
+		 * 3. View Application 
+		 * 		-Book [Successful Application] (SELF) 
+		 * 		-View Registered Project Applications 
+		 *			->Help Applicant book 
+		 *			->Print receipt 
+		 *			->Approve/Reject Withdrawal 
+		 * 4. Enquires menu 
+		 * 		-View current enquires 
+		 * 		-Create enquire 
+		 * 		-Reply enquires 
+		 * 5. Registration 
+		 * 		-View registration application 
+		 * 		-Approve/Reject
+		 * 6. Management 
+		 * 		-View currently managed projects 
+		 * 7. Generate report
+		 * 
+		 * 
+		 * **NOTE: -Single Project Management per Application Period [MANAGER] -> Regarding creating project?
+		 */
