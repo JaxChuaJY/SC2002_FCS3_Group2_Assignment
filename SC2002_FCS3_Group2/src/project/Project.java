@@ -5,38 +5,77 @@ import user.HDBManager;
 import user.HDBOfficer;
 
 import java.time.LocalDate;
-import java.util.*;	
+import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;	
 
 public class Project {
 	protected String projectName;
 	protected String neighbourhood;
-	protected Map<FlatType, Integer> flatSupply;
+	protected EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply;
 	protected LocalDate openingDate;
 	protected LocalDate closingDate;
 	protected HDBManager manager;
 	protected int officerSlots;
-	protected List<HDBOfficer> officerList = new ArrayList<HDBOfficer> ();
+	protected List<HDBOfficer> officerList;
 	private boolean isVisible;
 	
 	
 	public Project() { 
 	}
 
-	public Project(String name, String area, LocalDate date1, LocalDate date2) {	
+	public Project(String name, String area, EnumMap<FlatType, SimpleEntry<Integer, Double>> flatMap, LocalDate date1, LocalDate date2, int offSlots) {
 		this.projectName = name;
 		this.neighbourhood = area;
+		this.flatSupply = flatMap;
 		this.openingDate = date1;
 		this.closingDate = date2;
+		this.officerSlots = offSlots;
+		this.officerList = new ArrayList<HDBOfficer>();
 	}
 	
-	public void printFlatSupply() {									//Do we need a getFlatSupply()?
-		System.out.println("Flat Types and available units:");
+	
+	//-------Misc.
+	public void toggleVisibility() {
+		isVisible = !isVisible;
+	}
+	
+	public boolean checkOfficerSlotCap() {
+		if (officerList.size() >= officerSlots) {
+			return false;
+		}else {
+			return true;
+		}
+	}
+	
+	public String toString() {
+		return "Project: " + projectName
+			     + "\n\tNeighbourhood: " + neighbourhood
+			     + "\n\tFlat Supply: " + flatSupply.toString() //Fix flatSupply print.
+			     + "\n\tManaged by: " + manager.getName();
+	}
+
+	//-------ADDING
+	
+	public void addManager(HDBManager manager) {
+		this.manager = manager;
+	}
+	
+	public void addOfficer(HDBOfficer officer) {
+		officerList.add(officer);
+		//officerslots -1 		Only if this means empty slots
+	}
+	
+	//-------PRINTING STATEMENTS
+	
+	public void printFlatSupply() {
+		System.out.print("Flat Types and available units:");
 		if (flatSupply.isEmpty()) {
 			System.out.print("No flats lmao");
 		}
 		else {
-			for (Map.Entry<FlatType, Integer> entry : flatSupply.entrySet()) {
-				System.out.println("\t"+entry.getKey()+ ": " +entry.getValue()+ " units");
+			for (Entry<FlatType, SimpleEntry<Integer, Double>> entry : flatSupply.entrySet()) {
+				System.out.print(entry.getKey()+ ": " +entry.getValue()+ " units");
 			}
 		}
 	}
@@ -53,29 +92,8 @@ public class Project {
 		}
 	}
 	
-	public void toggleVisibility() {
-		isVisible = !isVisible;
-	}
 	
-	public String toString() {
-		return "Project: " + projectName
-			     + "\n\tNeighbourhood: " + neighbourhood
-			     + "\n\tFlat Supply: " + flatSupply.toString() //Fix flatSupply print.
-			     + "\n\tManaged by: " + manager.getName();
-	}
-
-	public void addOfficer(HDBOfficer e) {
-		officerList.add(e);
-		
-	}
-	
-	public boolean checkOfficerSlotCap() {
-		if (officerList.size() >= officerSlots) {
-			return false;
-		}else {
-			return true;
-		}
-	}
+	//-------GETTER AND SETTERS
 	
 	public String getProjectName() {
 		return projectName;
@@ -92,12 +110,16 @@ public class Project {
 	public void setNeighbourhood(String neighbourhood) {
 		this.neighbourhood = neighbourhood;
 	}
+	
+	public Set<FlatType> getFlatTypes() {         // For filtering
+	    return flatSupply.keySet();
+	}
 
-	public Map<FlatType, Integer> getFlatSupply() {
+	public EnumMap<FlatType, SimpleEntry<Integer, Double>> getFlatSupply() {
 		return flatSupply;
 	}
 
-	public void setFlatSupply(Map<FlatType, Integer> flatSupply) {
+	public void setFlatSupply(EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply) {
 		this.flatSupply = flatSupply;
 	}
 
@@ -141,10 +163,6 @@ public class Project {
 		this.officerList = officerList;
 	}
 
-	public boolean isVisible() {
-		return isVisible;
-	}
-
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
 	}
@@ -153,6 +171,7 @@ public class Project {
 		// TODO Auto-generated method stub
 		return isVisible;
 	}
+
 	
 	
 }

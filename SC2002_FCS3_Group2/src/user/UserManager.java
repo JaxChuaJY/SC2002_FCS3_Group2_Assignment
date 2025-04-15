@@ -7,72 +7,61 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
+import enums.MaritalStatus;
+import interfaces.IFileHandler;
 import interfaces.IUserManager;
 
 public class UserManager implements IUserManager{
-	private List<User> list;
+	private List<User> userList;
 	private User currentUser;
 	
-	// Map that stores the userType + fileName
-		private static Map<Class<? extends User>, String> userMap = Map.of(Applicant.class, "ApplicantList.csv",
+	// Map that stores the userType + fileName for writeFile_changePW
+	private static Map<Class<? extends User>, String> userMap = Map.of(Applicant.class, "ApplicantList.csv",
 				HDBManager.class, "ManagerList.csv", HDBOfficer.class, "OfficerList.csv");
-		private static String directory = "data/";
+	private static String directory = "data/";
 	
-	public UserManager(){
-		list = readingALLUsers();
+	private static final String[] USER_FILES = {"data/ApplicantList.csv","data/ManagerList.csv","data/OfficerList.csv"};//,"data/ManagerList.csv","data/OfficerList.csv"};
+	private final IFileHandler fileHandler;
+	
+	public UserManager(IFileHandler fH){
+		userList = new ArrayList<>();
+		fileHandler = fH;
+		loadUsersFromCSV();
+		
 	}
 	
-	public static List<User> readingALLUsers() {
-		List<User> allUsers = new ArrayList<>();
-		for (Map.Entry<Class<? extends User>, String> entry : userMap.entrySet()) {
-			allUsers.addAll(readUsers(entry.getValue(), entry.getKey()));
+	private void loadUsersFromCSV() {
+		for (String filePath : USER_FILES) {
+			fileHandler.readFromFile(filePath).stream()
+				.skip(1)
+				.map(entry -> createUserFromFile(filePath, entry.split(",")))
+				.filter(Objects::nonNull)
+				.forEach(userList::add);
 		}
-		return allUsers;
 	}
+	
+	private User createUserFromFile(String file, String[] values) {
+		
+	    String name = values[0];
+	    String nric = values[1];
+	    int age = Integer.valueOf(values[2]);
+	    MaritalStatus status = MaritalStatus.valueOf(values[3].toUpperCase());
+	    String password = values[4];
 
-	// Abstract for all user types
-	public static <T extends User> List<User> readUsers(String filename, Class<T> clazz) {
-		List<User> list = new ArrayList<User>();
-		try (Scanner scanner = new Scanner(new File(directory + filename))) {
-			scanner.useDelimiter(",");
-
-			if (scanner.hasNextLine()) {
-				scanner.nextLine(); // Read and discard the first row
-			}
-
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				String[] data = line.split(",");
-
-				if (data.length < 5) {
-					throw new Exception("Data dirty -- Missing data");
-				}
-
-				T user = clazz.getDeclaredConstructor().newInstance();
-				user.setName(data[0]);
-				user.setNric(data[1]);
-				user.setAge(Integer.parseInt(data[2]));
-				user.setMaritalStatus(data[3].toUpperCase());
-				user.setPassword(data[4]);
-
-				list.add(user);
-			}
-			// scanner.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Unable to find file!");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.out.println("Error in reading File! -- AGE conversion");
-			e.printStackTrace();
-		} catch (Exception e) {
-			System.out.println("General Error!");
-			e.printStackTrace();
-		}
-
-		return list;
-
+	    switch(file) {
+	        case "data/ApplicantList.csv":
+	            return new Applicant(name, nric, age, status, password);
+	        case "data/ManagerList.csv":
+	            return new HDBManager(name, nric, age, status, password);
+	        case "data/OfficerList.csv":
+	            return new HDBOfficer(name, nric, age, status, password);
+	        default:
+	            System.out.println("Invalid File");
+	            return null;
+	    }
 	}
 	
 	public static void writeFile_changePW(User user) {
@@ -155,13 +144,13 @@ public class UserManager implements IUserManager{
 	}
 	
 	public void printAllUser() {
-		for (User user : list) {
+		for (User user : userList) {
 			System.out.println(user);
 		}
 	}
 	
 	public User findUserLogin(String ic, String pw) {
-		for (User user : list) {
+		for (User user : userList) {
 			if (user.getNric().equals(ic) && user.getPassword().equals(pw)) {
 				return user;
 			}
@@ -184,11 +173,11 @@ public class UserManager implements IUserManager{
 	}
 
 	public void setList(List<User> list) {
-		this.list = list;
+		this.userList = list;
 	}
 	
 	public User searchUser_Type(Class<?> clazz, String name) throws Exception {
-	    for (User u : list) {
+	    for (User u : userList) {
 	        if (u.getClass().equals(clazz) && u.getName().equals(name)) {
 	            return u;
 	        }
@@ -201,18 +190,18 @@ public class UserManager implements IUserManager{
 	
 	//REMOVE
 	public void addUser(User u) {
-		list.add(u);
+		userList.add(u);
 	}
 
 	@Override
 	public void reIntialise() {
-		list = readingALLUsers();
+		loadUsersFromCSV();
 		
 	}
 
 	@Override
 	public User getUser(String nric) {
-		return list.stream()
+		return userList.stream()
 				.filter(entry -> entry.getNric().equals(nric.toUpperCase()))
 				.findAny()
 				.orElse(null);

@@ -5,19 +5,19 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+import enums.MaritalStatus;
 import interfaces.IOfficerRegister;
 import main.BTOManagementSystem;
 import project.Project;
 
 public class HDBOfficer extends Applicant implements IOfficerRegister {
+	
 	private List<Project> managedProject = new ArrayList<Project>();;
 
-	// REMOVE
-	public HDBOfficer(String n, int age, String nric) {
-		super.setName(n);
-		super.setAge(age);
-		super.setNric(nric);
-		super.setMaritalStatus(MaritalStatus.SINGLE);
+	
+	public HDBOfficer(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
+		super(name, nric, age, maritalstatus, password);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -41,10 +41,15 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 					btoSys.changePassword();
 					break;
 				case 2: 
+					btoSys.showProjMenu();
+					break;
 				case 3:
+					//Application
+					btoSys.showApplMenu();
+					break;
 				case 4:
 				case 5:
-					btoSys.getProjectRegManager().regSection_Officer(btoSys);
+					btoSys.showRegMenu();
 					break;
 				case 6:
 					return;
@@ -64,12 +69,17 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 
 	}
 
-	public HDBOfficer() {
-
-	}
 
 	public void addProject(Project p) {
 		managedProject.add(p);
+		
+		/* missing from git
+		 * boolean hasOverlap = managedProject.stream()
+		        .anyMatch(entry ->
+		            !(entry.getClosingDate().isBefore(project.getOpeningDate())
+		            || entry.getOpeningDate().isAfter(project.getClosingDate()))
+		        );
+		 * */
 	}
 
 	@Override

@@ -5,22 +5,17 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+import enums.MaritalStatus;
 import main.BTOManagementSystem;
 import project.Project;
 
 public class HDBManager extends User {
+	
 	private List<Project> managedProject = new ArrayList<Project>();
 
-	// REMOVE
-	public HDBManager(String n, int age, String nric) {
-		super.setName(n);
-		super.setAge(age);
-		super.setNric(nric);
-		super.setMaritalStatus(MaritalStatus.SINGLE);
-	}
-
-	public HDBManager() {
-
+	public HDBManager(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
+		super(name, nric, age, maritalstatus, password);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -34,9 +29,8 @@ public class HDBManager extends User {
 			System.out.println("3. Application Section");
 			System.out.println("4. Enquiries menu");
 			System.out.println("5. Registration Section");
-			System.out.println("6. Management section");
-			System.out.println("7. Generate report");
-			System.out.println("8. EXIT");
+			System.out.println("6. Generate report");
+			System.out.println("7. EXIT");
 			choice = sc.nextInt();
 
 			try {
@@ -45,14 +39,15 @@ public class HDBManager extends User {
 					btoSys.changePassword();
 					break;
 				case 2:
+					btoSys.showProjMenu();
+					break;
 				case 3:
 				case 4:
 				case 5:
-					btoSys.getProjectRegManager().regSection_Manager(btoSys);
+					btoSys.showRegMenu();
 					break;
 				case 6:
 				case 7:
-				case 8:
 					return;
 				default:
 					System.out.println("Input out of range");

@@ -31,7 +31,7 @@ public class Application {
         this.flatType = flatType;
         this.status = status;
     }
-	
+    
     /**
      * Sets the status of the application.
      *

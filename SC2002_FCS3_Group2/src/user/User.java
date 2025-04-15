@@ -1,5 +1,6 @@
 package user;
 
+import enums.MaritalStatus;
 import main.BTOManagementSystem;
 
 public abstract class User {
@@ -8,13 +9,25 @@ public abstract class User {
 	private int age;
 	MaritalStatus maritalStatus;
 	private String nric;
+	private FilterSettings filters;
+
+	public User(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
+		this.name = name;
+		this.nric = nric;
+		this.age = age;
+		this.maritalStatus = maritalstatus;
+		this.password = password;
+		this.filters = new FilterSettings();
+	}
 
 	public abstract void showMenu(BTOManagementSystem btoSys);
-	
 
-	public void setMaritalStatus(MaritalStatus maritalStatus) {
-		this.maritalStatus = maritalStatus;
+	public String toString() {
+		return "Name: " + name + " NRIC: " + nric + " Age: " + age + " maritalStatus " + maritalStatus + " Password: "
+				+ password + " | USER TYPE: " + this.getClass().toString();
 	}
+
+	//GETTER AND SETTERS
 
 	public String getName() {
 		return name;
@@ -43,6 +56,10 @@ public abstract class User {
 	public MaritalStatus getMaritalStatus() {
 		return maritalStatus;
 	}
+	
+	public void setMaritalStatus(MaritalStatus maritalStatus) {
+		this.maritalStatus = maritalStatus;
+	}
 
 	public void setMaritalStatus(String input) throws Exception {
 		for (MaritalStatus status : MaritalStatus.values()) {
@@ -62,10 +79,13 @@ public abstract class User {
 	public void setNric(String nric) {
 		this.nric = nric;
 	}
+	
+	public FilterSettings getFilters() {
+	    return this.filters;
+	}
 
-	public String toString() {
-		return "Name: " + name + " NRIC: " + nric + " Age: " + age + " maritalStatus " + maritalStatus + " Password: "
-				+ password + " | USER TYPE: " + this.getClass().toString();
+	public void setFilters(FilterSettings filters) {
+	    this.filters = filters;
 	}
 
 	

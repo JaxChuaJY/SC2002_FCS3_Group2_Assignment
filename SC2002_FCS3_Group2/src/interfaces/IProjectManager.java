@@ -9,7 +9,7 @@ public interface IProjectManager {
 
 	Project getProject(String projectName);
 
-	List<Project> getFilteredList(User user);
+	List<Project> getFilteredList_Register(User user);
 	
 	
 }

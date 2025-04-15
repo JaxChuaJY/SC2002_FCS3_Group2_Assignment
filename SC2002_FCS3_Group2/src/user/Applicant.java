@@ -6,11 +6,17 @@ import java.util.Scanner;
 import application.Application;
 import application.ApplicationManager;
 import enums.ApplicationStatus;
+import enums.MaritalStatus;
 import interfaces.IApplicantAction;
 import main.BTOManagementSystem;
 
 public class Applicant extends User implements IApplicantAction {
 	Application application;
+
+	public Applicant(String name, String nric, int age, 
+			MaritalStatus maritalstatus, String password){
+		super(name, nric, age, maritalstatus, password);
+	}
 
 	public Application getApplication() {
 		return application;
@@ -39,6 +45,8 @@ public class Applicant extends User implements IApplicantAction {
 					btoSys.changePassword();
 					break;
 				case 2:
+					btoSys.showProjMenu();
+					break;
 				case 3:
 				case 4:
 				case 5:

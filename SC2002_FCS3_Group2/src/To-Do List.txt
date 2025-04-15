@@ -1,7 +1,6 @@
 
 1. Make ProjectReg into interface?
-2. FileHandler...?
-3. Integrate other's reading/write methods
-4. Application menu
+2. FileHandler...? [Done]
+3. Integrate other's reading/write methods [Done]
+4. Application menu 
 5. Clean up unnecessary code and organize
-6. Comments.

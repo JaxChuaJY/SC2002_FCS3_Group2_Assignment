@@ -1,6 +1,9 @@
 package interfaces;
 
 import project.Project;
+import user.Applicant;
+import user.HDBManager;
+import user.HDBOfficer;
 import user.User;
 import application.Application;
 import enums.FlatType;
