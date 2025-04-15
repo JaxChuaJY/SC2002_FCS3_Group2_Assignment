@@ -15,7 +15,7 @@ public class RegistrationForm {
 		// TODO Auto-generated constructor stub
 		this.project = project;
 		registeredBy = user;
-		status = ApplicationStatus.WAITING;
+		status = ApplicationStatus.PENDING;
 	}
 	
 	public RegistrationForm() {
@@ -23,11 +23,11 @@ public class RegistrationForm {
 	}
 
 	public void approveStatus() {
-		status = ApplicationStatus.APPROVED;
+		status = ApplicationStatus.SUCCESSFUL;
 	}
 	
 	public void rejectStatus() {
-		status = ApplicationStatus.REJECTED;
+		status = ApplicationStatus.UNSUCCESSFUL;
 	}
 	
 	public String toString() {

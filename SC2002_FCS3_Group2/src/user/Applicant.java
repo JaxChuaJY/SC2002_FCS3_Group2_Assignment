@@ -4,24 +4,21 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import application.Application;
+import application.ApplicationManager;
+import enums.ApplicationStatus;
+import interfaces.IApplicantAction;
 import main.BTOManagementSystem;
 
-public class Applicant extends User{
+public class Applicant extends User implements IApplicantAction {
 	Application application;
-
-	
-	
-
 
 	public Application getApplication() {
 		return application;
 	}
 
-
 	public void setApplication(Application application) {
 		this.application = application;
 	}
-
 
 	@Override
 	public void showMenu(BTOManagementSystem btoSys) {
@@ -59,9 +56,32 @@ public class Applicant extends User{
 			}
 
 		} while (true);
-		
+
 	}
 
-	
+	@Override
+	public void applyForProject(Application a) {
+		this.application = a;
+
+	}
+
+	@Override
+	public void removeApplication() {
+		this.application = null;
+	}
+
+	@Override
+	public void withdrawApplication(ApplicationManager aM) {
+		aM.getApplicationList().values()
+				.forEach(set -> set.stream().filter(application -> application.getApplicant().equals(this))
+						.forEach(application -> application.setStatus(ApplicationStatus.WITHDRAW_REQUEST)));
+		System.out.println("Application withdrawn request successful.");
+		this.application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
+	}
+
+	@Override
+	public String viewApplicationStatus() {
+		return this.application.getStatus().toString();	
+	}
 
 }

@@ -1,7 +1,9 @@
 package enums;
 
 public enum ApplicationStatus {
-	APPROVED,
-	REJECTED,
-	WAITING
+	PENDING,
+	SUCCESSFUL,
+	UNSUCCESSFUL,
+	BOOKED,
+	WITHDRAW_REQUEST
 }

@@ -1,6 +1,5 @@
 package main;
 
-//**-------------Do the interface for the stuff
 
 public class main {
 

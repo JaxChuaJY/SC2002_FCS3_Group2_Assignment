@@ -148,6 +148,11 @@ public class Project {
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
 	}
+
+	public boolean getVisibility() {
+		// TODO Auto-generated method stub
+		return isVisible;
+	}
 	
 	
 }

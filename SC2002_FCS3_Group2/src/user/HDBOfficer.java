@@ -92,4 +92,9 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 		this.managedProject = managedProject;
 	}
 
+	public List<Project> getProjects() {
+		// TODO Auto-generated method stub
+		return managedProject;
+	}
+
 }

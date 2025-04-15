@@ -1,51 +1,6 @@
-1. Read Project File //Get officer via name but make sure they are officers [DONE]
-2. Read Registration Form [DONE]
-3. Write Registration Form to a file [DONE]
-4. Write Project File if successful Registering [DONE]
-5. Seperate the menus [DONE]
-6. Integrate code layout to GitHub's
-7. Tidy it up
 
-
-
-// temp user -- SINGLE!
-//			HDBManager manager = new HDBManager("ManagerSample", 26, "S0000000S");
-//			HDBOfficer officer = new HDBOfficer("OfficerSample", 29, "T0000000T");
-//
-//			// USERS
-//			userRepo = new UserRepo(FileManager.readingALLUsers());
-//			userRepo.addUser(officer);
-//			userRepo.addUser(manager);
-//			//userRepo.printAllUser();
-//
-//			// PROJECT -- TEMP
-//			projectManager = new ProjectManager(FileManager.readProject(userRepo));
-//			projectRegManager = new ProjectRegistration();
-//			
-//			List<Project> sampleList = new ArrayList<Project>();
-//			List<HDBOfficer> officerList = new ArrayList<HDBOfficer>();
-//			officerList.add(officer);
-//
-//			Project p = new Project("Summer Factories!", "Pioneer", LocalDate.of(2025, 1, 1),
-//					LocalDate.of(2026, 12, 12));
-//			p.setFlatSupply(Map.of(FlatType.TWO_ROOM, 2, FlatType.THREE_ROOM, 3));
-//			p.setManager(manager);
-//			p.setOfficerSlots(3);
-//			//p.setOfficerList(officerList);
-//			p.setVisible(true);
-//			
-//			Project x = new Project("Should not see", "Boon Lay", LocalDate.of(2026, 2, 2),
-//					LocalDate.of(2028, 1, 1));
-//			x.setFlatSupply(Map.of(FlatType.TWO_ROOM, 0, FlatType.THREE_ROOM, 5));
-//			x.setManager(manager);
-//			x.setOfficerSlots(1);
-//			//p.setOfficerList(officerList);
-//			x.setVisible(true);
-//
-//			sampleList.add(p);
-//			sampleList.add(x);
-//			projectManager = new ProjectManager(sampleList);
-//
-//			projectRegManager = new ProjectRegistration();
-//			manager.addProject(p);
-//			officer.addProject(p);
+1. Make ProjectReg into interface?
+2. FileHandler...?
+3. Application menu
+3. Clean up unnecessary code and organize
+4. Comments.

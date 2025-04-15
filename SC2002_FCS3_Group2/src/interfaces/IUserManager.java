@@ -2,11 +2,12 @@ package interfaces;
 
 import java.util.List;
 
+import user.Applicant;
 import user.User;
 
 public interface IUserManager {
 
-	String changePassword();
+	void changePassword();
 
 	boolean login();
 	
@@ -20,7 +21,11 @@ public interface IUserManager {
 	
 	User findUserLogin(String ic, String pw);
 	
+	void reIntialise();
+	
 	//REMOVE
 	void printAllUser();
+
+	User getUser(String nric);
 
 }

@@ -3,8 +3,11 @@ package main;
 
 import java.util.List;
 
+import application.ApplicationManager;
 import enums.ApplicationStatus;
 import file.FileManager;
+import interfaces.IApplicationManager;
+import interfaces.IFileHandler;
 import interfaces.IProjectManager;
 import interfaces.IUserManager;
 import project.Project;
@@ -17,16 +20,17 @@ import user.UserManager;
 public class BTOManagementSystem {
 	private IUserManager userManager;
     private IProjectManager projectManager;
-    private ProjectRegistration projectRegManager; //interface
-    //private final IApplicationManager applicationManager;
-	//private final IFileHandler fileHandler;
+    private ProjectRegistration projectRegManager; //interface this !
+    private final IApplicationManager applicationManager;
+	private final IFileHandler fileHandler;
+	
 	
 	BTOManagementSystem(){
-		//fileHandler = new FileHandler();
-		userManager = new UserManager(FileManager.readingALLUsers());
-		projectManager = new ProjectManager(FileManager.readProject(userManager));
-		projectRegManager = new ProjectRegistration(FileManager.readRegForms(userManager, projectManager));
-		//applicationManager = new ApplicationManager(projectManager,userManager,fileHandler);
+		fileHandler = new FileHandler();
+		userManager = new UserManager();
+		projectManager = new ProjectManager(userManager);
+		projectRegManager = new ProjectRegistration(userManager, projectManager);
+		applicationManager = new ApplicationManager(projectManager,userManager,fileHandler);
 	}
 	
 	public void startSystem() {
@@ -46,11 +50,11 @@ public class BTOManagementSystem {
 	}
 	
 	public void changePassword() { 
-		FileManager.writeFile_changePW(userManager.changePassword(), userManager.getcurrentUser());
+		userManager.changePassword();
 		userManager.logout();
 		
 		try {
-			userManager.setList(FileManager.readingALLUsers());
+			userManager.reIntialise();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,7 +69,6 @@ public class BTOManagementSystem {
 	
 	public void newRegisterProject(Project p) {
 		projectRegManager.register(p, (HDBOfficer)userManager.getcurrentUser());
-		FileManager.writeFile_newRegForm(p, (HDBOfficer)userManager.getcurrentUser());
 	}
 	
 	public List<Project> filterListRegister(){
@@ -73,16 +76,9 @@ public class BTOManagementSystem {
 		return projectRegManager.getNonRegList(filteredList, (HDBOfficer) userManager.getcurrentUser());
 	}
 	
-	public void setRegistrationStatus(RegistrationForm f) {
-		if (f.getStatus() == ApplicationStatus.APPROVED) {
-			//Write the officer List inside
-			f.getProject().addOfficer(f.getRegisteredBy());
-			f.getRegisteredBy().addProject(f.getProject());
-			FileManager.writeFile_addOfficer(f);
-		}
-		
-		
-		FileManager.writeFile_setRegForm(f);
+	public void addOfficerToProj(RegistrationForm f) {
+		f.getProject().addOfficer(f.getRegisteredBy());
+		f.getRegisteredBy().addProject(f.getProject());	
 	}
 	
 	/**
