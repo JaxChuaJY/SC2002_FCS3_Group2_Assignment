@@ -1,6 +1,0 @@
-
-1. Make ProjectReg into interface?
-2. FileHandler...?
-3. Application menu
-3. Clean up unnecessary code and organize
-4. Comments.
