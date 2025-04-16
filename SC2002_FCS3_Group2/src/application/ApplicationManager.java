@@ -1,30 +1,23 @@
 package application;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 import enums.ApplicationStatus;
 import enums.FlatType;
-import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
 import interfaces.IUserManager;
-import main.FileHandler;
 import project.Project;
-import project.ProjectManager;
-import project.FlatTypeConverter;
 import user.Applicant;
 import user.HDBManager;
 import user.HDBOfficer;
 import user.User;
-import user.UserManager;
 
 /**
  * Manages applications for BTO projects, including creating, retrieving,
@@ -64,13 +57,36 @@ public class ApplicationManager implements IApplicationManager {
 	 */
 	@Override
 	public void loadApplicationFromCSV() {
-		fileHandler.readFromFile(APPLICATIONS_FILE).stream().skip(1).map(entry -> entry.split(","))
-				.map(this::createApplicationFromFile).filter(application -> application != null)
-				.forEach(application -> applicationList
-						.computeIfAbsent(application.getProject().getProjectName(), k -> new HashSet<>())
-						.add(application));
+		fileHandler.readFromFile(APPLICATIONS_FILE).stream()
+        .skip(1)
+        .map(entry -> entry.split(","))
+        .map(this::createApplicationFromFile)
+        .filter(application -> application != null)
+        .forEach(application -> {
+            applicationList.computeIfAbsent(application.getProject().getProjectName(), k -> new HashSet<>())
+                    .add(application);
+            User user = userManager.getUser(application.getApplicant().getNric());
+            if (user instanceof Applicant applicant) {
+                applicant.setApplication(application);
+            }
+        });
 	}
 
+	/**
+	 * Saves the current application data to a CSV file.
+	 * The CSV file will include the project name, applicant, flat type, and application status.
+	 * The header row will be added at the beginning of the file.
+	 */
+	@Override
+	public void saveApplicationtoCSV() {
+		List<String> fileFormat = applicationList.values().stream()
+				.flatMap(Set::stream)
+				.map(data -> data.fileFormat())
+				.toList();
+		fileFormat.add(0, "Project Name,Applicant,FlatType,ApplicationStatus");
+		fileHandler.writeToFile(APPLICATIONS_FILE,fileFormat);
+	}
+	
 	/**
 	 * Helper function. Creates an Application object from a CSV row.
 	 *
@@ -81,7 +97,7 @@ public class ApplicationManager implements IApplicationManager {
 	private Application createApplicationFromFile(String[] values) {
 		String projectName = values[0];
 		String nric = values[1];
-		FlatType flatType = FlatTypeConverter.convertToFlatType(values[2]);
+		FlatType flatType = FlatType.fromString(values[2]);
 		ApplicationStatus appStatus = ApplicationStatus.valueOf(values[3].toUpperCase());
 
 		Project project = projectManager.getProject(projectName);
@@ -116,7 +132,15 @@ public class ApplicationManager implements IApplicationManager {
 		if (applicant instanceof HDBOfficer officer && officer.getProjects().contains(project)) {
 			throw new IllegalArgumentException("Cannot apply for a project you are managing.");
 		}
-
+		
+		if (applicant.getApplication() != null && 
+				(applicant.getApplication().getStatus() == ApplicationStatus.WITHDRAWN
+				|| applicant.getApplication().getStatus() == ApplicationStatus.UNSUCCESSFUL)) {
+			Set<Application> projectApps = applicationList.get(applicant.getApplication().getProject().getProjectName());
+	        if (projectApps != null) {
+	            projectApps.remove(applicant.getApplication());
+	        }
+		}
 		Application a = new Application(applicant, project, flatType, ApplicationStatus.PENDING);
 		applicationList.computeIfAbsent(project.getProjectName(), k -> new HashSet<>()).add(a);
 		applicant.applyForProject(a);

@@ -1,11 +1,16 @@
 package main;
 
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 import application.Application;
 import application.ApplicationManager;
+import enums.ApplicationStatus;
+import enums.FlatType;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
@@ -283,75 +288,147 @@ public class BTOManagementSystem {
 
 	public void showMenuApplicant(Applicant user) {
 		//Prints only 1 application? idk
-			System.out.println(applicationManager.getApplicationsForUser(user));
+		Scanner sc = new Scanner(System.in);
+		
+		Application application = user.getApplication();
+		boolean hasApplication = application != null 
+			    && !(application.getStatus() == ApplicationStatus.WITHDRAWN 
+			         || application.getStatus() == ApplicationStatus.UNSUCCESSFUL);
+		
+		System.out.println("**--Applicant Application Page");
+		System.out.println("Existing Application");
+		if (application == null) {
+		    System.out.println("NONE");
+		} else {
+		    System.out.println(application);
+		    if (!hasApplication) {
+		        System.out.println("(Status: " + application.getStatus() + " — You may reapply)");
+		    }
+		}
+		System.out.println("1. " + (hasApplication ? "Withdraw Application" : "Apply for Project"));
+		System.out.println("2. EXIT");
+		
+		int choice = sc.nextInt();
+		switch (choice) {
+	    case 1:
+	        if (hasApplication) {
+	            // Handle withdrawal
+	            applicationManager.requestWithdrawal(user);
+	            System.out.println("Withdrawal Request Sent.");
+	            System.out.println(applicationManager.getApplicationsForUser(user));
+	        } else {
+	            List<Project> projectList = projectManager.getProjectList(user);
+	            int listSize = projectList.size();
+	            System.out.println("-".repeat(27));
+	            System.out.printf("%-2s %-20s %-15s %-12s\n", " ", "Project Name", "Neighborhood", "Closing Date");
+
+	            for (int i = 0; i < listSize; i++) {
+	                Project project = projectList.get(i);
+	                String formattedDate = project.getClosingDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+	                System.out.printf("%-2s %-20s %-15s %-12s\n", 
+	                		(i + 1) + ".", 
+	                		project.getProjectName(), 
+	                		project.getNeighbourhood(), 
+	                		formattedDate);
+	            }
+	            System.out.println("-".repeat(27));
+				System.out.println((listSize+1) + ". EXIT");
+				choice = sc.nextInt();
+				if (1 <= choice && choice <= listSize) {
+					Project selected = projectList.get(choice-1);
+					List<FlatType> flatTypeList = new ArrayList<>(selected.getFlatTypes());
+
+				    System.out.println("\nAvailable Flat Types:");
+				    IntStream.range(0, flatTypeList.size())
+				             .forEach(i -> System.out.println((i + 1) + ". " + flatTypeList.get(i)));
+
+				    System.out.print("Select a flat type: ");
+				    int flatChoice = sc.nextInt();
+				    if (flatChoice >= 1 && flatChoice <= flatTypeList.size()) {
+				        applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
+				        System.out.println("Application submitted for project: " + selected.getProjectName());
+				    } else {
+				        System.out.println("Invalid flat type selection.");
+				    }
+				}
+	            
+	        }
+	        break;
+	    case 2:
+	        System.out.println("Exiting application page.");
+	        break;
+	    default:
+	        System.out.println("Invalid option. Please try again.");
+	        break;
+		}
 	}
 
 	//Missing book and print function?
 	public void showMenuOfficer(HDBOfficer user) {
 
-			int choice = -1;
-			Scanner sc = new Scanner(System.in);
+		int choice = -1;
+		Scanner sc = new Scanner(System.in);
 
-			do {
-				int listSize = user.getManagedProject().size();
-				for (int i = 0; i < listSize; i++) {
-					System.out.println((i + 1) + ". " + user.getManagedProject().get(i).getProjectName());
-				}
-				System.out.println((user.getManagedProject().size() + 1) + ". EXIT");
-				choice = sc.nextInt(); // try-catch &
+		do {
+			int listSize = user.getManagedProject().size();
+			for (int i = 0; i < listSize; i++) {
+				System.out.println((i + 1) + ". " + user.getManagedProject().get(i).getProjectName());
+			}
+			System.out.println((user.getManagedProject().size() + 1) + ". EXIT");
+			choice = sc.nextInt(); // try-catch &
 
-				if (1 <= choice && choice <= listSize) {
-					Project selected = user.getManagedProject().get(choice-1);
-					List<Application> list = applicationManager.getApplicationsForProject(selected);
-					listSize = list.size();
-					do {
-						for (int i = 0; i < list.size(); i++) {
-							System.out.println((i + 1) + ". \n" + list.get(i).toString());
-						}
-						System.out.println((list.size()+1) + ". EXIT");
-						choice = sc.nextInt();
+			if (1 <= choice && choice <= listSize) {
+				Project selected = user.getManagedProject().get(choice-1);
+				List<Application> list = applicationManager.getApplicationsForProject(selected);
+				listSize = list.size();
+				do {
+					for (int i = 0; i < list.size(); i++) {
+						System.out.println((i + 1) + ". \n" + list.get(i).toString());
+					}
+					System.out.println((list.size()+1) + ". EXIT");
+					choice = sc.nextInt();
 
-						if (1 <= choice && choice <= listSize) {
-							// Choose to book or print
-							Application application = list.get(choice-1);
+					if (1 <= choice && choice <= listSize) {
+						// Choose to book or print
+						Application application = list.get(choice-1);
 
-							do {
-								System.out.print(application + "\n");
-								System.out.println("1. Book");
-								System.out.println("2. Print Receipt");
-								System.out.println("3. Previous");
-								choice = sc.nextInt();
+						do {
+							System.out.print(application + "\n");
+							System.out.println("1. Book");
+							System.out.println("2. Print Receipt");
+							System.out.println("3. Previous");
+							choice = sc.nextInt();
 
-								switch (choice) {
-								case 1:
-									//Book function missing?
-								case 2:
-									//Print receipt?
-								case 3:
-									System.out.println("Going to Previous Page");
-									break;
-								default:
-									System.out.println("Try again.");
-								}
-							} while (true);
+							switch (choice) {
+							case 1:
+								//Book function missing?
+							case 2:
+								//Print receipt?
+							case 3:
+								System.out.println("Going to Previous Page");
+								break;
+							default:
+								System.out.println("Try again.");
+							}
+						} while (true);
 
-						} else if (listSize+1 == choice) {
-							System.out.println("Going to Previous Page");
-							break;
-						} else {
-							System.out.println("Try again.");
-						}
+					} else if (listSize+1 == choice) {
+						System.out.println("Going to Previous Page");
+						break;
+					} else {
+						System.out.println("Try again.");
+					}
 
-					} while (true);
+				} while (true);
 
-				} else if (listSize+1 == choice) {
-					System.out.println("Exitting Application Section");
-					return;
-				} else {
-					System.out.println("Try again.");
-				}
+			} else if (listSize+1 == choice) {
+				System.out.println("Exiting Application Section");
+				return;
+			} else {
+				System.out.println("Try again.");
+			}
 
-			} while (true);
+		} while (true);
 	}
 
 	//Copypasted from Officer just added switch choice of approve/reject

@@ -90,4 +90,14 @@ public class Application {
                "Status: " + status.toString() + "\n" +
                "===========================";
 	}
+	
+	/**
+     * Returns a file format string representation of the application, including the applicant's NRIC,
+     * project name, flat type, and status.
+     *
+     * @return a file format string representation of the application
+     */
+	public String fileFormat() {
+		return project.getProjectName() + "," + applicant.getNric() + "," + flatType.toDisplayString() + "," + status.toString();
+	}
 }
