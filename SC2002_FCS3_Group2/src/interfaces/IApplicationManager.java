@@ -16,6 +16,9 @@ public interface IApplicationManager {
     // Load applications from a data source (e.g., CSV)
     void loadApplicationFromCSV();
 
+    // Save applications to a data source (e.g., CSV)
+    void saveApplicationtoCSV();
+    
     // Create a new application for a user and project
     void createApplication(User user, Project project, FlatType flatType);
 
