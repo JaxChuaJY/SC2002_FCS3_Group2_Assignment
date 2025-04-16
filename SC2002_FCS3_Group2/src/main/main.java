@@ -24,7 +24,10 @@ public class main {
 		}
 
 
-		btoSys.getUserManager().getcurrentUser().showMenu(btoSys);
+		do {
+			btoSys.getUserManager().getcurrentUser().showMenu(btoSys);
+		}while (btoSys.getUserManager().getcurrentUser() != null);
+		
 			
 		System.out.println("Exitting program...");
 

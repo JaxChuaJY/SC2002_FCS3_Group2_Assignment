@@ -37,7 +37,8 @@ public class HDBManager extends User {
 				switch (choice) {
 				case 1:
 					btoSys.changePassword();
-					break;
+					btoSys.login();
+					return;
 				case 2:
 					btoSys.showProjMenu();
 					break;
@@ -48,6 +49,7 @@ public class HDBManager extends User {
 					break;
 				case 6:
 				case 7:
+					btoSys.logout();
 					return;
 				default:
 					System.out.println("Input out of range");

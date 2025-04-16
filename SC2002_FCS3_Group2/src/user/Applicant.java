@@ -43,13 +43,15 @@ public class Applicant extends User implements IApplicantAction {
 				switch (choice) {
 				case 1:
 					btoSys.changePassword();
-					break;
+					btoSys.login();
+					return;
 				case 2:
 					btoSys.showProjMenu();
 					break;
 				case 3:
 				case 4:
 				case 5:
+					btoSys.logout();
 					return;
 				default:
 					System.out.println("Input out of range");

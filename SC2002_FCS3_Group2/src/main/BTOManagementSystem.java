@@ -45,15 +45,19 @@ public class BTOManagementSystem {
         }
 	}
 	
-	private void login() {
+	public void login() {
 		do {
 			userManager.login();
 		} while (userManager.getcurrentUser() == null);
 	}
 	
+	public void logout() {
+		userManager.logout();
+	}
+	
 	public void changePassword() { 
 		userManager.changePassword();
-		userManager.logout();
+		logout();
 		
 		try {
 			userManager.reIntialise();
@@ -61,7 +65,6 @@ public class BTOManagementSystem {
 			e.printStackTrace();
 		}
 		
-		login();
 		
 	}
 	
@@ -175,7 +178,7 @@ public class BTOManagementSystem {
 			switch (choice) {
 			case 1:
 				do {
-					List<RegistrationForm> filteredList = btoSys.getProjectRegManager().getFilteredList(user);
+					List<RegistrationForm> filteredList = projectRegManager.getFilteredList(user);
 
 					int i = 1;
 					for (RegistrationForm r : filteredList) {
@@ -204,7 +207,7 @@ public class BTOManagementSystem {
 									System.out.println("Automatic rejection...");
 									selected.rejectStatus();
 								}
-								btoSys.addOfficerToProj(selected);
+								addOfficerToProj(selected);
 								projectRegManager.writeFile_setRegForm(selected);
 								projectRegManager.writeFile_addOfficer(selected);
 								return;

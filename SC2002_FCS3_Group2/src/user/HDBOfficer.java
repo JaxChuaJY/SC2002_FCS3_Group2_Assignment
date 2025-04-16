@@ -39,7 +39,8 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 				switch (choice) {
 				case 1:
 					btoSys.changePassword();
-					break;
+					btoSys.login();
+					return;
 				case 2: 
 					btoSys.showProjMenu();
 					break;
@@ -52,6 +53,7 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 					btoSys.showRegMenu();
 					break;
 				case 6:
+					btoSys.logout();
 					return;
 				default:
 					System.out.println("Input out of range");
