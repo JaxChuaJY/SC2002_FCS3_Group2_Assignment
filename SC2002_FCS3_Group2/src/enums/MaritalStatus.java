@@ -1,19 +1,21 @@
 package enums;
 
+import java.util.Set;
+
 public enum MaritalStatus {
     SINGLE {
         @Override
-        public boolean canView(FlatType flatType, int age) {
-            return age >= 35 && flatType == FlatType.TWO_ROOM;
+        public boolean canView(Set<FlatType> set, int age) {
+            return age >= 35 && set.contains(FlatType.TWO_ROOM);
         }
     },
     MARRIED {
         @Override
-        public boolean canView(FlatType flatType, int age) {
+        public boolean canView(Set<FlatType> set, int age) {
             return age >= 21 && 
-                (flatType == FlatType.TWO_ROOM || flatType == FlatType.THREE_ROOM);
+                (set.contains(FlatType.TWO_ROOM) || set.contains(FlatType.THREE_ROOM));
         }
     };
 
-    public abstract boolean canView(FlatType flatType, int age);
+    public abstract boolean canView(Set<FlatType> set, int age);
 }

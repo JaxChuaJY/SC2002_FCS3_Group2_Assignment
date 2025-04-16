@@ -321,4 +321,12 @@ public class ProjectManager implements IProjectManager {
 		}
 	}
 
+	@Override
+	public List<Project> getProjectList(User user) {
+		return this.projectList.stream()
+		        .filter(project -> 
+		            user.getMaritalStatus().canView(project.getFlatTypes(), user.getAge()) && project.getVisibility())
+		        .toList();
+	}
+
 }
