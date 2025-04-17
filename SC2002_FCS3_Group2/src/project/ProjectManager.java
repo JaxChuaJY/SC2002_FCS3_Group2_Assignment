@@ -103,20 +103,18 @@ public class ProjectManager implements IProjectManager {
 		for (String line : noHeaderLines) {
 			String[] items = line.split(",");
 			EnumMap<FlatType, SimpleEntry<Integer, Double>> flatMap = new EnumMap<>(FlatType.class);
-			// Mapping of FlatType with number of units + price
-			if (items[2].equalsIgnoreCase("two-room")) {
-				flatMap.put(FlatType.TWO_ROOM,
-						new SimpleEntry(Integer.parseInt(items[3]), Double.parseDouble(items[4])));
-			} else {
-				flatMap.put(FlatType.THREE_ROOM,
-						new SimpleEntry(Integer.parseInt(items[3]), Double.parseDouble(items[4])));
+			//Mapping of FlatType with number of units + price
+			if (items[2].equalsIgnoreCase("2-room")) {
+				flatMap.put(FlatType.TWO_ROOM, new SimpleEntry(Integer.parseInt(items[3]), Double.parseDouble(items[4])));
 			}
-			if (items[5].equalsIgnoreCase("two-room")) {
-				flatMap.put(FlatType.TWO_ROOM,
-						new SimpleEntry(Integer.parseInt(items[6]), Double.parseDouble(items[7])));
-			} else {
-				flatMap.put(FlatType.THREE_ROOM,
-						new SimpleEntry(Integer.parseInt(items[6]), Double.parseDouble(items[7])));
+			else {
+				flatMap.put(FlatType.THREE_ROOM, new SimpleEntry(Integer.parseInt(items[3]), Double.parseDouble(items[4])));
+			}
+			if (items[5].equalsIgnoreCase("2-room")) {
+				flatMap.put(FlatType.TWO_ROOM, new SimpleEntry(Integer.parseInt(items[6]), Double.parseDouble(items[7])));
+			}
+			else {
+				flatMap.put(FlatType.THREE_ROOM, new SimpleEntry(Integer.parseInt(items[6]), Double.parseDouble(items[7])));
 			}
 
 			String name = items[0];
@@ -328,14 +326,16 @@ public class ProjectManager implements IProjectManager {
 	        return this.projectList.stream()
 	                .filter(project -> 
 	                officer.getMaritalStatus().canView(project.getFlatTypes(), officer.getAge()) 
-                    && project.getVisibility() 
+                    && LocalDate.now().isBefore(project.getClosingDate())
+                    && LocalDate.now().isAfter(project.getOpeningDate())
                     && !officer.getManagedProject().contains(project))
 	                .toList();
 	    } else {
 	        return this.projectList.stream()
 	                .filter(project -> 
 	                    user.getMaritalStatus().canView(project.getFlatTypes(), user.getAge()) 
-	                    && project.getVisibility())
+	                    && LocalDate.now().isBefore(project.getClosingDate())
+	                    && LocalDate.now().isAfter(project.getOpeningDate()))
 	                .toList();
 	    }
 	}

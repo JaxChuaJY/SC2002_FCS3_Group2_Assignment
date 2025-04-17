@@ -403,7 +403,7 @@ public class BTOManagementSystem {
 				listSize = list.size();
 				do {
 					for (int i = 0; i < list.size(); i++) {
-						System.out.println((i + 1) + list.get(i).toString());
+						System.out.println((i + 1) + ". " + list.get(i).toString());
 					}
 					System.out.println((list.size()+1) + ". EXIT");
 					choice = sc.nextInt();
@@ -464,7 +464,7 @@ public class BTOManagementSystem {
 	        List<Project> managedProjects = user.getManagedProject();
 	        int listSize = managedProjects.size();
 
-	        System.out.println("\n--- Managed Projects ---");
+	        System.out.println("\n**--Manager Applications Page");
 	        for (int i = 0; i < listSize; i++) {
 	            System.out.println((i + 1) + ". " + managedProjects.get(i).getProjectName());
 	        }
@@ -498,7 +498,7 @@ public class BTOManagementSystem {
 		        }
 	            System.out.println("\n--- Applications ---");
 	            for (int i = 0; i < applications.size(); i++) {
-	                System.out.println((i + 1) + ". \n" + applications.get(i));
+	                System.out.println((i + 1) + ". " + applications.get(i));
 	            }
 	            System.out.println((applications.size() + 1) + ". BACK");
 
