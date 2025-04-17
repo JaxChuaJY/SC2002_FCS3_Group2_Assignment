@@ -323,10 +323,21 @@ public class ProjectManager implements IProjectManager {
 
 	@Override
 	public List<Project> getProjectList(User user) {
-		return this.projectList.stream()
-		        .filter(project -> 
-		            user.getMaritalStatus().canView(project.getFlatTypes(), user.getAge()) && project.getVisibility())
-		        .toList();
+	    if (user instanceof HDBOfficer) {
+	    	HDBOfficer officer = (HDBOfficer) user;
+	        return this.projectList.stream()
+	                .filter(project -> 
+	                officer.getMaritalStatus().canView(project.getFlatTypes(), officer.getAge()) 
+                    && project.getVisibility() 
+                    && !officer.getManagedProject().contains(project))
+	                .toList();
+	    } else {
+	        return this.projectList.stream()
+	                .filter(project -> 
+	                    user.getMaritalStatus().canView(project.getFlatTypes(), user.getAge()) 
+	                    && project.getVisibility())
+	                .toList();
+	    }
 	}
 
 }
