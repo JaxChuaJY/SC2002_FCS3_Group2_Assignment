@@ -4,13 +4,10 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import application.Application;
-import application.ApplicationManager;
-import enums.ApplicationStatus;
 import enums.MaritalStatus;
-import interfaces.IApplicantAction;
 import main.BTOManagementSystem;
 
-public class Applicant extends User implements IApplicantAction {
+public class Applicant extends User {
 	Application application;
 
 	public Applicant(String name, String nric, int age, 
@@ -70,30 +67,4 @@ public class Applicant extends User implements IApplicantAction {
 		} while (true);
 
 	}
-
-	@Override
-	public void applyForProject(Application a) {
-		this.application = a;
-
-	}
-
-	@Override
-	public void removeApplication() {
-		this.application = null;
-	}
-
-	@Override
-	public void withdrawApplication(ApplicationManager aM) {
-		aM.getApplicationList().values()
-				.forEach(set -> set.stream().filter(application -> application.getApplicant().equals(this))
-						.forEach(application -> application.setStatus(ApplicationStatus.WITHDRAW_REQUEST)));
-		System.out.println("Application withdrawn request successful.");
-		this.application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
-	}
-
-	@Override
-	public String viewApplicationStatus() {
-		return this.application.getStatus().toString();	
-	}
-
 }

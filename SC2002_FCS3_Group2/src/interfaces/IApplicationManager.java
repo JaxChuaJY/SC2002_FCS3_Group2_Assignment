@@ -1,16 +1,11 @@
 package interfaces;
 
 import project.Project;
-import user.Applicant;
-import user.HDBManager;
-import user.HDBOfficer;
 import user.User;
 import application.Application;
 import enums.FlatType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface IApplicationManager {
     // Load applications from a data source (e.g., CSV)
@@ -29,15 +24,21 @@ public interface IApplicationManager {
     Application getApplicationsForUser(User user);
 
     // Approve an application for a user and project
-    void approveApplication(User user);
+    void approveApplication(Application application);
+    
+    // Reject an application for a user and project
+    void rejectApplication(Application application);
 
     // Request withdrawal of an application for a user
-    boolean requestWithdrawal(User user);
+    void requestWithdrawal(Application application);
 
     // Approve a withdrawal request for a user and project
-    void approveWithdrawal(User user);
+    void approveWithdrawal(Application application);
+    
+    // Reject a withdrawal request for a user and project
+    void rejectWithdrawal(Application application);
 
-    // Get the full application list (for internal use or admin purposes)
-    Map<String, Set<Application>> getApplicationList();
-
+    void bookFlat(Application application);
+    
+    void writeReceipt(Application application);
 }

@@ -45,7 +45,6 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 					btoSys.showProjMenu();
 					break;
 				case 3:
-					//Application
 					btoSys.showApplMenu();
 					break;
 				case 4:
@@ -108,5 +107,4 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 		// TODO Auto-generated method stub
 		return managedProject;
 	}
-
 }

@@ -1,11 +1,13 @@
 package application;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import enums.ApplicationStatus;
 import enums.FlatType;
@@ -82,7 +84,8 @@ public class ApplicationManager implements IApplicationManager {
 		List<String> fileFormat = applicationList.values().stream()
 				.flatMap(Set::stream)
 				.map(data -> data.fileFormat())
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
+
 		fileFormat.add(0, "Project Name,Applicant,FlatType,ApplicationStatus");
 		fileHandler.writeToFile(APPLICATIONS_FILE,fileFormat);
 	}
@@ -143,12 +146,7 @@ public class ApplicationManager implements IApplicationManager {
 		}
 		Application a = new Application(applicant, project, flatType, ApplicationStatus.PENDING);
 		applicationList.computeIfAbsent(project.getProjectName(), k -> new HashSet<>()).add(a);
-		applicant.applyForProject(a);
-	}
-
-	@Override
-	public Map<String, Set<Application>> getApplicationList() {
-		return this.applicationList;
+		applicant.setApplication(a);
 	}
 
 	/**
@@ -172,28 +170,51 @@ public class ApplicationManager implements IApplicationManager {
 	 */
 	@Override
 	public List<Application> getApplicationsForProject(Project project) {
-		return applicationList.values().stream().flatMap(Set::stream).filter(a -> a.getProject().equals(project))
+		return applicationList.values().stream()
+				.flatMap(Set::stream).filter(a -> a.getProject().equals(project))
 				.toList();
 	}
 
 	/**
-	 * Approves an application for a user and project.
+	 * Approves an application for a user and project. Reserves one flatType in the project.
 	 *
 	 * @param user    the applicant whose application is to be approved
 	 * @param project the project associated with the application
 	 * @throws IllegalArgumentException if the NRIC or project is null
 	 */
 	@Override
-	public void approveApplication(User user) {
+	public void approveApplication(Application application) {
 
-		// Call this and ask for input etc.
-		/* getApplicationsForProject(project).forEach(System.out::println); */
-
-		applicationList.values().stream().flatMap(Set::stream)
-				.filter(a -> a.getApplicant().getNric().equals(user.getNric())).findFirst()
-				.ifPresent(a -> a.setStatus(ApplicationStatus.SUCCESSFUL));
+		if (application == null) {
+			throw new IllegalArgumentException("Application cannot be null.");
+		}
+		application.setStatus(ApplicationStatus.SUCCESSFUL);
+		
+		boolean reserved = application.getProject().reduceFlatSupply(application.getFlatType());
+		
+		if (reserved) {
+	        System.out.println("Flat successfully reserved for " + application.getApplicant().getName());
+	    } else {
+	        System.out.println("Flat type " + application.getFlatType() + " is no longer available.");
+	    }
 	}
-
+	
+	/**
+	 * Rejects an application for a user and project.
+	 *
+	 * @param user    the applicant whose application is to be approved
+	 * @param project the project associated with the application
+	 * @throws IllegalArgumentException if the NRIC or project is null
+	 */
+	@Override
+	public void rejectApplication(Application application) {
+		
+		if (application == null) {
+			throw new IllegalArgumentException("Application cannot be null.");
+		}
+		
+		application.setStatus(ApplicationStatus.UNSUCCESSFUL);
+	}
 	/**
 	 * Approves a withdrawal request for a user.
 	 *
@@ -201,41 +222,75 @@ public class ApplicationManager implements IApplicationManager {
 	 * @throws IllegalArgumentException if the user is null
 	 */
 	@Override
-	public void approveWithdrawal(User user) {
+	public void approveWithdrawal(Application application) {
 
-		// Call this and ask for input etc.
-		/*
-		 * getApplicationsForProject(project).stream() .filter(a ->
-		 * a.getStatus().equals(ApplicationStatus.WITHDRAW_REQUEST))
-		 * .forEach(System.out::println);
-		 */
-
-		if (user == null) {
-			throw new IllegalArgumentException("User must not be null.");
+		if (application == null) {
+			throw new IllegalArgumentException("Application cannot be null.");
 		}
-
-		for (Set<Application> applications : applicationList.values()) {
-			applications.removeIf(a -> a.getApplicant().getNric().equals(user.getNric()));
+		
+		application.setStatus(ApplicationStatus.WITHDRAWN);
+		
+	}
+	
+	/**
+	 * Rejects withdrawal of an application for a user.
+	 *
+	 * @param user the user requesting the withdrawal (must be an Applicant)
+	 */
+	@Override
+	public void rejectWithdrawal(Application application) {
+		
+		if (application == null) {
+			throw new IllegalArgumentException("application cannot be null.");
 		}
-
-		if (user instanceof Applicant applicant) {
-			applicant.removeApplication();
+		if (application.getPreviousStatus() == ApplicationStatus.BOOKED) {
+			application.getProject().increaseFlatSupply(application.getFlatType());
 		}
+		application.revertStatus();
+		
 	}
 
 	/**
 	 * Requests withdrawal of an application for a user.
 	 *
 	 * @param user the user requesting the withdrawal (must be an Applicant)
-	 * @return true if the withdrawal request was successful, false otherwise
 	 */
 	@Override
-	public boolean requestWithdrawal(User user) {
-		if (user instanceof Applicant applicant) {
-			applicant.withdrawApplication(this);
-			return true;
+	public void requestWithdrawal(Application application) {
+		
+		if (application == null) {
+			throw new IllegalArgumentException("application cannot be null.");
 		}
-		return false;
+		application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
+		
 	}
 
+	@Override
+	public void bookFlat(Application application) {
+		if (application == null) {
+			throw new IllegalArgumentException("application cannot be null.");
+		}
+		application.setStatus(ApplicationStatus.BOOKED);
+	}
+
+	@Override
+	public void writeReceipt(Application application) {
+	    if (application == null) throw new IllegalArgumentException("Application cannot be null.");
+
+	    String fileName = "receipt/receipt_" + application.getApplicant().getNric() + ".txt";
+	    StringBuilder receipt = new StringBuilder();
+
+	    receipt.append("==== HDB BTO Flat Booking Receipt ====\n");
+	    receipt.append("Name: ").append(application.getApplicant().getName()).append("\n");
+	    receipt.append("NRIC: ").append(application.getApplicant().getNric()).append("\n");
+	    receipt.append("Age: ").append(application.getApplicant().getAge()).append("\n");
+	    receipt.append("Marital Status: ").append(application.getApplicant().getMaritalStatus()).append("\n\n");
+
+	    receipt.append("Flat Type Booked: ").append(application.getFlatType()).append("\n");
+	    receipt.append("Project Name: ").append(application.getProject().getProjectName()).append("\n");
+	    receipt.append("Location: ").append(application.getProject().getNeighbourhood()).append("\n");
+	    receipt.append("Booking Status: ").append(application.getStatus()).append("\n");
+
+	    fileHandler.writeToFile(fileName, List.of(receipt.toString()));
+	}
 }

@@ -15,6 +15,7 @@ public class Application {
 	private Project project;
 	private FlatType flatType;
 	private ApplicationStatus status;
+	private ApplicationStatus previousStatus;
 	
 	/**
      * Constructs a new Application with the specified details.
@@ -42,9 +43,16 @@ public class Application {
         if (status == null) {
             throw new IllegalArgumentException("Status cannot be null.");
         }
+        this.previousStatus = this.status;
         this.status = status;
     }
-	
+    
+    public void revertStatus() {
+        this.status = this.previousStatus;
+    }
+    public ApplicationStatus getPreviousStatus() {
+        return this.previousStatus;
+    }
 	public void viewProject() {
 		System.out.print(project);
 	}
@@ -76,6 +84,9 @@ public class Application {
 		return this.status;
 	}
 	
+	public FlatType getFlatType() {
+		return this.flatType;
+	}
 	/**
      * Returns a string representation of the application, including the applicant's NRIC,
      * project name, flat type, and status.
@@ -100,4 +111,6 @@ public class Application {
 	public String fileFormat() {
 		return project.getProjectName() + "," + applicant.getNric() + "," + flatType.toDisplayString() + "," + status.toString();
 	}
+
+	
 }

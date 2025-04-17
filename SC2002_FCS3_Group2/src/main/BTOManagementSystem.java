@@ -58,6 +58,7 @@ public class BTOManagementSystem {
 	
 	public void logout() {
 		userManager.logout();
+		applicationManager.saveApplicationtoCSV();
 	}
 	
 	public void changePassword() { 
@@ -153,7 +154,7 @@ public class BTOManagementSystem {
 					return;
 
 				case 3:
-					System.out.println("Exitting Registration Page...");
+					System.out.println("Exiting Registration Page...");
 					break;
 				default:
 					System.out.println("INVALID INPUT");
@@ -236,7 +237,7 @@ public class BTOManagementSystem {
 
 				} while (true);
 			case 2:
-				System.out.println("Exitting Registration Page...");
+				System.out.println("Exiting Registration Page...");
 				return;
 			default:
 				System.out.println("INVALID INPUT");
@@ -265,7 +266,19 @@ public class BTOManagementSystem {
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showMenuManager((HDBManager) userManager.getcurrentUser());
 		} else if (userManager.getcurrentUser() instanceof HDBOfficer) {
-			//showMenuOfficer((HDBOfficer) userManager.getcurrentUser());
+			Scanner sc = new Scanner(System.in);
+			System.out.println("Continue as");
+			System.out.println("1. HDB Officer");
+			System.out.println("2. Applicant");
+			int choice = sc.nextInt();
+			if (choice == 1) {
+				showMenuOfficer((HDBOfficer) userManager.getcurrentUser());
+			} else if (choice == 2) {
+				showMenuApplicant((Applicant) userManager.getcurrentUser());
+			} else {
+				System.out.println("Invalid Choice");
+				return;
+			}
 		}else if (userManager.getcurrentUser() instanceof Applicant) {
 			showMenuApplicant( (Applicant) userManager.getcurrentUser());
 		}
@@ -313,12 +326,16 @@ public class BTOManagementSystem {
 	    case 1:
 	        if (hasApplication) {
 	            // Handle withdrawal
-	            applicationManager.requestWithdrawal(user);
+	            applicationManager.requestWithdrawal(application);
 	            System.out.println("Withdrawal Request Sent.");
 	            System.out.println(applicationManager.getApplicationsForUser(user));
 	        } else {
 	            List<Project> projectList = projectManager.getProjectList(user);
 	            int listSize = projectList.size();
+	            if (listSize == 0) {
+	            	System.out.println("No Available Projects Now.");
+	            	return;
+	            }
 	            System.out.println("-".repeat(27));
 	            System.out.printf("%-2s %-20s %-15s %-12s\n", " ", "Project Name", "Neighborhood", "Closing Date");
 
@@ -345,7 +362,7 @@ public class BTOManagementSystem {
 				    System.out.print("Select a flat type: ");
 				    int flatChoice = sc.nextInt();
 				    if (flatChoice >= 1 && flatChoice <= flatTypeList.size()) {
-				        applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
+				    	applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
 				        System.out.println("Application submitted for project: " + selected.getProjectName());
 				    } else {
 				        System.out.println("Invalid flat type selection.");
@@ -371,6 +388,7 @@ public class BTOManagementSystem {
 
 		do {
 			int listSize = user.getManagedProject().size();
+			System.out.println("**--Officer Applications Page");
 			for (int i = 0; i < listSize; i++) {
 				System.out.println((i + 1) + ". " + user.getManagedProject().get(i).getProjectName());
 			}
@@ -379,7 +397,9 @@ public class BTOManagementSystem {
 
 			if (1 <= choice && choice <= listSize) {
 				Project selected = user.getManagedProject().get(choice-1);
-				List<Application> list = applicationManager.getApplicationsForProject(selected);
+				List<Application> list = applicationManager.getApplicationsForProject(selected).stream()
+										.filter(application ->application.getStatus()==ApplicationStatus.SUCCESSFUL)
+										.toList();
 				listSize = list.size();
 				do {
 					for (int i = 0; i < list.size(); i++) {
@@ -401,9 +421,13 @@ public class BTOManagementSystem {
 
 							switch (choice) {
 							case 1:
-								//Book function missing?
+								applicationManager.bookFlat(application);
+								System.out.println("Flat Successfully booked. Exiting");
+								break;
 							case 2:
-								//Print receipt?
+								applicationManager.writeReceipt(application);
+								System.out.println("Receipt printed. Exiting");
+								break;
 							case 3:
 								System.out.println("Going to Previous Page");
 								break;
@@ -433,78 +457,105 @@ public class BTOManagementSystem {
 
 	//Copypasted from Officer just added switch choice of approve/reject
 	public void showMenuManager(HDBManager user) {
-			int choice = -1;
-			Scanner sc = new Scanner(System.in);
+	    Scanner sc = new Scanner(System.in);
+	    int choice = -1;
 
-			do {
-				int listSize = user.getManagedProject().size();
-				for (int i = 0; i < listSize; i++) {
-					System.out.println((i + 1) + ". " + user.getManagedProject().get(i).getProjectName());
-				}
-				System.out.println((user.getManagedProject().size() + 1) + ". EXIT");
-				choice = sc.nextInt(); // try-catch &
+	    while (true) {
+	        List<Project> managedProjects = user.getManagedProject();
+	        int listSize = managedProjects.size();
 
-				if (1 <= choice && choice <= listSize) {
-					Project selected = user.getManagedProject().get(choice-1);
-					List<Application> list = applicationManager.getApplicationsForProject(selected);
-					listSize = list.size();
-					do {
-						for (int i = 0; i < list.size(); i++) {
-							System.out.println((i + 1) + ". \n" + list.get(i).toString());
-						}
-						System.out.println((list.size()+1) + ". EXIT");
-						choice = sc.nextInt();
+	        System.out.println("\n--- Managed Projects ---");
+	        for (int i = 0; i < listSize; i++) {
+	            System.out.println((i + 1) + ". " + managedProjects.get(i).getProjectName());
+	        }
+	        System.out.println((listSize + 1) + ". EXIT");
 
-						if (1 <= choice && choice <= listSize) {
-							// Choose to book or print
-							Application application = list.get(choice-1);
+            choice = sc.nextInt();
+            sc.nextLine();
 
-							 do {
-									System.out.print(application);
-									System.out.println("1. Print Receipt");
-									System.out.println("2. Approve");
-									System.out.println("3. Reject");
-									System.out.println("4. Previous");
-									choice = sc.nextInt();
+	        if (choice == listSize + 1) {
+	            System.out.println("Exiting Application Section");
+	            break;
+	        }
 
-									switch (choice) {
-									case 1:
-										//Print receipt?
-									case 2:
-										//Approve -- Do we edit the Project file
-										//Number of units for Type 2 decrease?
-										applicationManager.approveApplication(application.getApplicant());
-										System.out.println("Approved. Exitting");
-										return;
-									case 3:
-										//Reject -- Missing?
-										System.out.println("Rejected. Exitting");
-										return;
-									case 4:
-										System.out.println("Going to Previous Page");
-										break;
-									default:
-										System.out.println("Try again.");
-									}
-								} while (true);
+	        if (choice < 1 || choice > listSize) {
+	            System.out.println("Try again.");
+	            continue;
+	        }
 
-						} else if (listSize+1 == choice) {
-							System.out.println("Going to Previous Page");
-							break;
-						} else {
-							System.out.println("Try again.");
-						}
+	        Project selectedProject = managedProjects.get(choice - 1);
+	        List<Application> applications = applicationManager.getApplicationsForProject(selectedProject)
+	            .stream()
+	            .filter(a -> a.getStatus() == ApplicationStatus.PENDING || a.getStatus() == ApplicationStatus.WITHDRAW_REQUEST)
+	            .toList();
 
-					} while (true);
+	        if (applications.isEmpty()) {
+	            System.out.println("No applications to process.");
+	            continue;
+	        }
 
-				} else if (listSize+1 == choice) {
-					System.out.println("Exitting Application Section");
-					return;
-				} else {
-					System.out.println("Try again.");
-				}
+	        while (true) {
+	            System.out.println("\n--- Applications ---");
+	            for (int i = 0; i < applications.size(); i++) {
+	                System.out.println((i + 1) + ". \n" + applications.get(i));
+	            }
+	            System.out.println((applications.size() + 1) + ". BACK");
 
-			} while (true);
+                choice = sc.nextInt();
+                sc.nextLine();
+
+	            if (choice == applications.size() + 1) {
+	                System.out.println("Going back to project list.");
+	                break;
+	            }
+
+	            if (choice < 1 || choice > applications.size()) {
+	                System.out.println("Try again.");
+	                continue;
+	            }
+
+	            Application application = applications.get(choice - 1);
+
+	            while (true) {
+	                if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+	                    System.out.println("1. Approve Withdrawal");
+	                    System.out.println("2. Reject Withdrawal");
+	                    System.out.println("3. Back");
+	                } else {
+	                    System.out.println("1. Approve Application");
+	                    System.out.println("2. Reject Application");
+	                    System.out.println("3. Back");
+	                }
+                	choice = sc.nextInt();
+                    sc.nextLine();
+
+	                if (choice == 1) {
+	                    if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+	                        applicationManager.approveWithdrawal(application);
+	                        System.out.println("Withdrawal approved.");
+	                    } else {
+	                        applicationManager.approveApplication(application);
+	                        System.out.println("Application approved.");
+	                    }
+	                    break;
+	                } else if (choice == 2) {
+	                    if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+	                        applicationManager.rejectWithdrawal(application);
+	                        System.out.println("Withdrawal rejected.");
+	                    } else {
+	                        applicationManager.rejectApplication(application);
+	                        System.out.println("Application rejected.");
+	                    }
+	                    break;
+	                } else if (choice == 3) {
+	                    System.out.println("Returning to application list.");
+	                    break;
+	                } else {
+	                    System.out.println("Try again.");
+	                }
+	            }
+	        }
+	    }
 	}
 		
 	
