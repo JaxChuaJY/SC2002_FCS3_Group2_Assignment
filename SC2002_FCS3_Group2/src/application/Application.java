@@ -24,13 +24,15 @@ public class Application {
      * @param project   the BTO project being applied for
      * @param flatType  the type of flat being applied for
      * @param status    the initial status of the application
+	 * @param prevStatus 
      * @throws IllegalArgumentException if any parameter is null
      */
-    public Application(Applicant applicant, Project project, FlatType flatType, ApplicationStatus status) {
+    public Application(Applicant applicant, Project project, FlatType flatType, ApplicationStatus status, ApplicationStatus prevStatus) {
         this.applicant = applicant;
         this.project = project;
         this.flatType = flatType;
         this.status = status;
+    	this.previousStatus = prevStatus;
     }
     
     /**
@@ -93,14 +95,7 @@ public class Application {
      *
      * @return a string representation of the application
      */
-	public String toString() {
-		return "===========================\n" +
-               "NRIC: " + applicant.getNric() + "\n" +
-               "Project: " + project.getProjectName() + "\n" +
-               "Flat Type: " + flatType.toString() + "\n" +
-               "Status: " + status.toString() + "\n" +
-               "===========================";
-	}
+	public String toString() { return "NRIC: " + applicant.getNric() + " Project: " + project.getProjectName() + " Flat Type: " + flatType + " Status: " + status; }
 	
 	/**
      * Returns a file format string representation of the application, including the applicant's NRIC,
@@ -109,7 +104,7 @@ public class Application {
      * @return a file format string representation of the application
      */
 	public String fileFormat() {
-		return project.getProjectName() + "," + applicant.getNric() + "," + flatType.toDisplayString() + "," + status.toString();
+		return project.getProjectName() + "," + applicant.getNric() + "," + flatType.toDisplayString() + "," + status.toString() + "," + previousStatus.toString();
 	}
 
 	

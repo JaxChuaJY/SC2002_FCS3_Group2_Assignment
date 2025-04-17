@@ -86,7 +86,7 @@ public class ApplicationManager implements IApplicationManager {
 				.map(data -> data.fileFormat())
 				.collect(Collectors.toCollection(ArrayList::new));
 
-		fileFormat.add(0, "Project Name,Applicant,FlatType,ApplicationStatus");
+		fileFormat.add(0, "Project Name,Applicant,FlatType,ApplicationStatus,PreviousStatus");
 		fileHandler.writeToFile(APPLICATIONS_FILE,fileFormat);
 	}
 	
@@ -102,11 +102,12 @@ public class ApplicationManager implements IApplicationManager {
 		String nric = values[1];
 		FlatType flatType = FlatType.fromString(values[2]);
 		ApplicationStatus appStatus = ApplicationStatus.valueOf(values[3].toUpperCase());
+		ApplicationStatus prevStatus = ApplicationStatus.valueOf(values[4].toUpperCase());
 
 		Project project = projectManager.getProject(projectName);
 		Applicant user = (Applicant) userManager.getUser(nric);
 
-		return new Application(user, project, flatType, appStatus);
+		return new Application(user, project, flatType, appStatus, prevStatus);
 	}
 	
 	/**
@@ -144,7 +145,7 @@ public class ApplicationManager implements IApplicationManager {
 	            projectApps.remove(applicant.getApplication());
 	        }
 		}
-		Application a = new Application(applicant, project, flatType, ApplicationStatus.PENDING);
+		Application a = new Application(applicant, project, flatType, ApplicationStatus.PENDING, ApplicationStatus.PENDING);
 		applicationList.computeIfAbsent(project.getProjectName(), k -> new HashSet<>()).add(a);
 		applicant.setApplication(a);
 	}
@@ -228,7 +229,9 @@ public class ApplicationManager implements IApplicationManager {
 		if (application == null) {
 			throw new IllegalArgumentException("Application cannot be null.");
 		}
-		
+		if (application.getPreviousStatus() == ApplicationStatus.BOOKED) {
+			application.getProject().increaseFlatSupply(application.getFlatType());
+		}
 		application.setStatus(ApplicationStatus.WITHDRAWN);
 		
 	}
@@ -244,9 +247,7 @@ public class ApplicationManager implements IApplicationManager {
 		if (application == null) {
 			throw new IllegalArgumentException("application cannot be null.");
 		}
-		if (application.getPreviousStatus() == ApplicationStatus.BOOKED) {
-			application.getProject().increaseFlatSupply(application.getFlatType());
-		}
+		
 		application.revertStatus();
 		
 	}

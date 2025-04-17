@@ -403,7 +403,7 @@ public class BTOManagementSystem {
 				listSize = list.size();
 				do {
 					for (int i = 0; i < list.size(); i++) {
-						System.out.println((i + 1) + ". \n" + list.get(i).toString());
+						System.out.println((i + 1) + list.get(i).toString());
 					}
 					System.out.println((list.size()+1) + ". EXIT");
 					choice = sc.nextInt();
@@ -430,7 +430,7 @@ public class BTOManagementSystem {
 								break;
 							case 3:
 								System.out.println("Going to Previous Page");
-								break;
+								return;
 							default:
 								System.out.println("Try again.");
 							}
@@ -483,18 +483,19 @@ public class BTOManagementSystem {
 	            continue;
 	        }
 
-	        Project selectedProject = managedProjects.get(choice - 1);
-	        List<Application> applications = applicationManager.getApplicationsForProject(selectedProject)
-	            .stream()
-	            .filter(a -> a.getStatus() == ApplicationStatus.PENDING || a.getStatus() == ApplicationStatus.WITHDRAW_REQUEST)
-	            .toList();
-
-	        if (applications.isEmpty()) {
-	            System.out.println("No applications to process.");
-	            continue;
-	        }
+	        
 
 	        while (true) {
+	        	Project selectedProject = managedProjects.get(choice - 1);
+		        List<Application> applications = applicationManager.getApplicationsForProject(selectedProject)
+		            .stream()
+		            .filter(a -> a.getStatus() == ApplicationStatus.PENDING || a.getStatus() == ApplicationStatus.WITHDRAW_REQUEST)
+		            .toList();
+
+		        if (applications.isEmpty()) {
+		            System.out.println("No applications to process.");
+		            break;
+		        }
 	            System.out.println("\n--- Applications ---");
 	            for (int i = 0; i < applications.size(); i++) {
 	                System.out.println((i + 1) + ". \n" + applications.get(i));
