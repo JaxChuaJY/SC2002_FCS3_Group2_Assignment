@@ -19,6 +19,6 @@ public enum FlatType {
 	    }
 	}
     public String toDisplayString() {
-        return name().replace("_", "-").replace("TWO", "2").replace("THREE", "3") + " Room";
+        return name().replace("_", "-").replace("TWO", "2").replace("THREE", "3");
     }
 }

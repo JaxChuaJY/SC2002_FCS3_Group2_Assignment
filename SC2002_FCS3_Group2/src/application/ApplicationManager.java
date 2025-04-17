@@ -126,7 +126,7 @@ public class ApplicationManager implements IApplicationManager {
 			throw new IllegalArgumentException("Invalid applicant.");
 		}
 
-		if (project == null || LocalDate.now().isAfter(project.getClosingDate()) || project.getVisibility() == false) {
+		if (project == null || LocalDate.now().isAfter(project.getClosingDate()) || !project.getVisibility()) {
 			throw new IllegalArgumentException("Invalid project.");
 		}
 
@@ -188,11 +188,12 @@ public class ApplicationManager implements IApplicationManager {
 		if (application == null) {
 			throw new IllegalArgumentException("Application cannot be null.");
 		}
-		application.setStatus(ApplicationStatus.SUCCESSFUL);
+		
 		
 		boolean reserved = application.getProject().reduceFlatSupply(application.getFlatType());
 		
 		if (reserved) {
+			application.setStatus(ApplicationStatus.SUCCESSFUL);
 	        System.out.println("Flat successfully reserved for " + application.getApplicant().getName());
 	    } else {
 	        System.out.println("Flat type " + application.getFlatType() + " is no longer available.");

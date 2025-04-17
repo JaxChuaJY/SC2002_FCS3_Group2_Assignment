@@ -43,6 +43,8 @@ public class HDBManager extends User {
 					btoSys.showProjMenu();
 					break;
 				case 3:
+					btoSys.showApplMenu();
+					break;
 				case 4:
 				case 5:
 					btoSys.showRegMenu();

@@ -32,6 +32,7 @@ public class Project {
 		this.closingDate = date2;
 		this.officerSlots = offSlots;
 		this.officerList = new ArrayList<HDBOfficer>();
+		this.isVisible = true;
 	}
 	
 	
@@ -170,6 +171,27 @@ public class Project {
 	public boolean getVisibility() {
 		// TODO Auto-generated method stub
 		return isVisible;
+	}
+
+	public void increaseFlatSupply(FlatType flatType) {
+		if (flatSupply.containsKey(flatType)) {
+	        SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
+	        int newSupply = entry.getKey() + 1;
+	        flatSupply.put(flatType, new SimpleEntry<>(newSupply, entry.getValue()));
+	    } else {
+	        throw new IllegalArgumentException("Flat type not found in project supply.");
+	    }
+	}
+
+	public boolean reduceFlatSupply(FlatType flatType) {
+		SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
+
+	    if (entry == null || entry.getKey() <= 0) {
+	        return false;
+	    }
+
+	    flatSupply.put(flatType, new SimpleEntry<>(entry.getKey() - 1, entry.getValue()));
+	    return true;
 	}
 
 	
