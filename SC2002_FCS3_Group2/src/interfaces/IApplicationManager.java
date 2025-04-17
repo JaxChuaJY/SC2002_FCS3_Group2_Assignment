@@ -41,4 +41,6 @@ public interface IApplicationManager {
     void bookFlat(Application application);
     
     void writeReceipt(Application application);
+
+	void viewReceipt(Application application);
 }

@@ -309,11 +309,14 @@ public class BTOManagementSystem {
 			         || application.getStatus() == ApplicationStatus.UNSUCCESSFUL);
 		
 		System.out.println("**--Applicant Application Page");
-		System.out.println("Existing Application");
+		System.out.print("Existing Application: ");
 		if (application == null) {
 		    System.out.println("NONE");
 		} else {
 		    System.out.println(application);
+		    if (application.getStatus() == ApplicationStatus.BOOKED) {
+		    	applicationManager.viewReceipt(application);
+		    }
 		    if (!hasApplication) {
 		        System.out.println("(Status: " + application.getStatus() + " — You may reapply)");
 		    }
@@ -414,9 +417,9 @@ public class BTOManagementSystem {
 
 						do {
 							System.out.print(application + "\n");
-							System.out.println("1. Book");
-							System.out.println("2. Print Receipt");
-							System.out.println("3. Previous");
+							System.out.println("1. Book Flat");
+							System.out.println("2. Print Receipt to TXT");
+							System.out.println("3. Back to Application List");
 							choice = sc.nextInt();
 
 							switch (choice) {

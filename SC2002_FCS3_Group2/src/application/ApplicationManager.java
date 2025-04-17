@@ -295,4 +295,12 @@ public class ApplicationManager implements IApplicationManager {
 
 	    fileHandler.writeToFile(fileName, List.of(receipt.toString()));
 	}
+	
+	@Override
+	public void viewReceipt(Application application) {
+		if (application == null) throw new IllegalArgumentException("Application cannot be null.");
+		
+		String fileName = "receipt/receipt_" + application.getApplicant().getNric() + ".txt";
+		fileHandler.readFromFile(fileName).stream().forEach(System.out::println);
+	}
 }
