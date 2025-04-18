@@ -50,6 +50,7 @@ public class Applicant extends User {
 					break;
 				case 4:
 					btoSys.showEnquiryMenu();
+					break;
 				case 5:
 					btoSys.logout();
 					return;
