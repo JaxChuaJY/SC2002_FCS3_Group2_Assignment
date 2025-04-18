@@ -3,6 +3,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         EnquiryManager manager = new EnquiryManager();
+        String filename = "enquiries.csv";
+
+        manager.loadFromCSV(filename);
+        manager.printAll();
+
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -73,6 +78,7 @@ public class Main {
                     break;
                 }
                 case 0 -> {
+                    manager.exportToCSV("enquiries.csv");
                     System.out.println("Exiting program. Goodbye!");
                     break;
                 }
