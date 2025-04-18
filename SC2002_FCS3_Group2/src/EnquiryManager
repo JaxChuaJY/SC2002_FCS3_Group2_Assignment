@@ -1,8 +1,17 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EnquiryManager {
     private List<Enquiry> enquiryList;
+
+    private static final DateTimeFormatter a = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public EnquiryManager() {
         enquiryList = new ArrayList<>();
@@ -111,4 +120,107 @@ public class EnquiryManager {
         }
         System.out.println("Enquiry not found.");
     }
+
+    public void loadFromCSV(String filename) {
+        File file = new File(filename);
+
+        if (!file.exists()) {
+            System.out.println("CSV file not found. Creating an empty file.");
+            try (FileWriter writer = new FileWriter(filename)) {
+                writer.write("EnquiryId,Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+            } catch (IOException e) {
+                System.out.println("Error creating CSV file: " + e.getMessage());
+            }
+            return; // keep the current enquiryList (not replaced)
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine(); // skip header
+            while ((line = br.readLine()) != null) {
+                String[] parts = parseCSVLine(line);
+                if (parts.length >= 7) {
+                    String sender = parts[0];
+                    String project = parts[1];
+                    String message = parts[2];
+                    String reply = parts[3];
+                    LocalDate dateCreated = LocalDate.parse(parts[4], a);
+                    LocalDate dateReplied = parts[5].isEmpty() ? null : LocalDate.parse(parts[5], a);                    
+                    boolean replied = Boolean.parseBoolean(parts[6]);
+
+                    Enquiry e = new Enquiry(sender, project, message);
+                    e.setMessage(message);
+                    if (replied) {
+                        e.setReply(reply);
+                        e.setDateReplied(dateReplied);
+                    }
+                    e.setDateCreated(dateCreated);
+                    enquiryList.add(e);
+                }
+            }
+            System.out.println("Loaded enquiries from " + filename);
+        } catch (IOException e) {
+            System.out.println("Error reading CSV: " + e.getMessage());
+        }
+    }
+
+    private String[] parseCSVLine(String line) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+    
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+    
+            if (ch == '\"') {
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '\"') {
+                    current.append('\"'); // escaped quote
+                    i++;
+                } else {
+                    inQuotes = !inQuotes; // toggle quote mode
+                }
+            } else if (ch == ',' && !inQuotes) {
+                tokens.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(ch);
+            }
+        }
+    
+        tokens.add(current.toString()); // add last field
+        return tokens.toArray(new String[0]);
+    }
+    
+
+    public void exportToCSV(String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            // Write CSV header
+            writer.write("Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+    
+            for (Enquiry e : enquiryList) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(escapeCSV(e.getSender())).append(",");
+                sb.append(escapeCSV(e.getProject())).append(",");
+                sb.append(escapeCSV(e.getMessage())).append(",");
+                sb.append(escapeCSV(e.getReply())).append(",");
+                sb.append(e.getDateCreated()).append(",");
+                sb.append(e.getDateReplied() == null ? "" : e.getDateReplied()).append(",");
+                sb.append(e.isReplied());
+                writer.write(sb.toString());
+                writer.write("\n");
+            }
+    
+            System.out.println("Enquiries exported to: " + filename);
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
+
+    private String escapeCSV(String field) {
+        if (field == null) return "";
+        if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
+            field = field.replace("\"", "\"\"");
+            return "\"" + field + "\"";
+        }
+        return field;
+    }    
 }
