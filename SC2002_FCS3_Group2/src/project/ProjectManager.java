@@ -163,6 +163,44 @@ public class ProjectManager implements IProjectManager{
 		}
 		return false;
 	}
+	public void updateFlatRooms(Project project, FlatType flatType, int x) {		// x is the number to increase / decrease the "X-ROOMS" number (1 / -1)
+		project.updateFlatSupply(flatType, x);
+		
+		try {
+	        List<String> newlist = new ArrayList<>();
+	        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	        String line;
+
+	        while ((line = reader.readLine()) != null) {
+	            String[] items = line.split(",");
+	            if (items[0].equalsIgnoreCase(project.getProjectName())) {
+	                
+	            	for (int i = 2; i < items.length - 2; i += 3) {
+	                    String typeStr = items[i].trim();
+	                    if (typeStr.equalsIgnoreCase(flatType.name())) { 
+	                        int currCount = Integer.parseInt(items[i + 1].trim());
+	                        items[i + 1] = String.valueOf(currCount + x);
+	                        break;
+	                    }
+	            	}
+	            	line = String.join(",", items);
+	            }
+	            newlist.add(line);
+	        }
+	        reader.close();
+	        
+	        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+	        for (String entry : newlist) {
+	            writer.write(entry);
+	            writer.newLine();
+	        }
+	        writer.close();
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
 	public Project getProject(String projectName) {
 		for (Project proj : projectList) {
 			if (proj.getProjectName().equalsIgnoreCase(projectName)) {
@@ -171,7 +209,6 @@ public class ProjectManager implements IProjectManager{
 		}
 		return null;
 	}
-	
 	
 	public void filterView(FilterSettings filters) {
 	    System.out.println("\n=== Filtered Projects ===");
