@@ -8,12 +8,18 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 import application.Application;
+import application.ApplicationFileHandler;
 import application.ApplicationManager;
+import application.ApplicationService;
+import application.ReceiptManager;
 import enums.ApplicationStatus;
 import enums.FlatType;
+import interfaces.IApplicationFileHandler;
 import interfaces.IApplicationManager;
+import interfaces.IApplicationService;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
+import interfaces.IReceiptManager;
 import interfaces.IUserManager;
 import project.Project;
 import project.ProjectManager;
@@ -28,8 +34,8 @@ public class BTOManagementSystem {
 	private IUserManager userManager;
     private IProjectManager projectManager;
     private ProjectRegistration projectRegManager; //interface this !
-    private final IApplicationManager applicationManager;
-	private final IFileHandler fileHandler;
+    private IApplicationManager applicationManager;
+	private IFileHandler fileHandler;
 	
 	
 	BTOManagementSystem(){
@@ -37,11 +43,18 @@ public class BTOManagementSystem {
 		userManager = new UserManager(fileHandler);
 		projectManager = new ProjectManager(fileHandler, userManager);
 		projectRegManager = new ProjectRegistration(userManager, projectManager);
-		applicationManager = new ApplicationManager(projectManager,userManager,fileHandler);
+		
+		
+		IApplicationService applicationService = new ApplicationService(projectManager, userManager);
+		IApplicationFileHandler applicationFileHandler = new ApplicationFileHandler(fileHandler, projectManager, userManager, applicationService);
+		IReceiptManager receiptManager = new ReceiptManager(fileHandler);
+		
+		applicationManager = new ApplicationManager(applicationService, applicationFileHandler, receiptManager);
 	}
 	
 	public void startSystem() {
 		userManager.printAllUser();
+		applicationManager.loadApplicationFromCSV();
 		login();
         if (userManager.getcurrentUser() != null) {
         	System.out.println(userManager.getcurrentUser());
@@ -58,7 +71,6 @@ public class BTOManagementSystem {
 	
 	public void logout() {
 		userManager.logout();
-		applicationManager.saveApplicationtoCSV();
 	}
 	
 	public void changePassword() { 
@@ -330,6 +342,7 @@ public class BTOManagementSystem {
 	        if (hasApplication) {
 	            // Handle withdrawal
 	            applicationManager.requestWithdrawal(application);
+	            applicationManager.saveApplicationtoCSV();
 	            System.out.println("Withdrawal Request Sent.");
 	            System.out.println(applicationManager.getApplicationsForUser(user));
 	        } else {
@@ -365,10 +378,20 @@ public class BTOManagementSystem {
 				    System.out.print("Select a flat type: ");
 				    int flatChoice = sc.nextInt();
 				    if (flatChoice >= 1 && flatChoice <= flatTypeList.size()) {
-				    	applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
-				        System.out.println("Application submitted for project: " + selected.getProjectName());
+				        if (selected.getFlatSupply().containsKey(flatTypeList.get(flatChoice - 1))) {
+
+				            if (selected.getFlatSupply().get(flatTypeList.get(flatChoice - 1)).getKey() > 0) {
+				                applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
+				                applicationManager.saveApplicationtoCSV();
+				                System.out.println("Application sent. Please wait for approval.");
+				            } else {
+				                System.out.println("Sorry, no units available for the selected flat type.");
+				            }
+				        } else {
+				            System.out.println("Invalid flat type selected.");
+				        }
 				    } else {
-				        System.out.println("Invalid flat type selection.");
+				        System.out.println("Invalid choice. Please select a valid flat type number.");
 				    }
 				}
 	            
@@ -425,6 +448,7 @@ public class BTOManagementSystem {
 							switch (choice) {
 							case 1:
 								applicationManager.bookFlat(application);
+								applicationManager.saveApplicationtoCSV();
 								System.out.println("Flat Successfully booked. Exiting");
 								break;
 							case 2:
@@ -541,6 +565,7 @@ public class BTOManagementSystem {
 	                        applicationManager.approveApplication(application);
 	                        System.out.println("Application approved.");
 	                    }
+	                    applicationManager.saveApplicationtoCSV();
 	                    break;
 	                } else if (choice == 2) {
 	                    if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
@@ -550,6 +575,7 @@ public class BTOManagementSystem {
 	                        applicationManager.rejectApplication(application);
 	                        System.out.println("Application rejected.");
 	                    }
+	                    applicationManager.saveApplicationtoCSV();
 	                    break;
 	                } else if (choice == 3) {
 	                    System.out.println("Returning to application list.");
@@ -557,6 +583,7 @@ public class BTOManagementSystem {
 	                } else {
 	                    System.out.println("Try again.");
 	                }
+	                
 	            }
 	        }
 	    }

@@ -173,27 +173,15 @@ public class Project {
 		return isVisible;
 	}
 
-	public void increaseFlatSupply(FlatType flatType) {
-		if (flatSupply.containsKey(flatType)) {
-	        SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
-	        int newSupply = entry.getKey() + 1;
-	        flatSupply.put(flatType, new SimpleEntry<>(newSupply, entry.getValue()));
-	    } else {
-	        throw new IllegalArgumentException("Flat type not found in project supply.");
-	    }
-	}
 
-	public boolean reduceFlatSupply(FlatType flatType) {
-		SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
-
-	    if (entry == null || entry.getKey() <= 0) {
+	public boolean updateFlatSupply(FlatType flatType, int x) {
+ 		SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
+ 		if (entry == null || entry.getKey() <= 0) {
 	        return false;
 	    }
-
-	    flatSupply.put(flatType, new SimpleEntry<>(entry.getKey() - 1, entry.getValue()));
-	    return true;
-	}
-
+ 		flatSupply.put(flatType, new AbstractMap.SimpleEntry<>(entry.getKey() + x, entry.getValue()));
+ 		return true;
+ 	}
 	
 	
 }
