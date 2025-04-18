@@ -1,0 +1,11 @@
+==== HDB BTO Flat Booking Receipt ====
+Name: John
+NRIC: S1234567A
+Age: 35
+Marital Status: SINGLE
+
+Flat Type Booked: THREE_ROOM
+Project Name: Maple Residences
+Location: Woodlands
+Booking Status: SUCCESSFUL
+
