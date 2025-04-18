@@ -37,9 +37,14 @@ public class Main {
                 case 3 -> {
                     System.out.print("Enter Enquiry ID to edit: ");
                     int editId = Integer.parseInt(scanner.nextLine());
-                    System.out.print("Enter new message: ");
-                    String newMessage = scanner.nextLine();
-                    manager.editEnquiry(editId, newMessage);
+                    if (!manager.editCheck(editId)) {
+                        System.out.println("Enquiry cannot be edited (either replied or not found).");
+                    }
+                    else {
+                        System.out.print("Enter new message: ");
+                        String newMessage = scanner.nextLine();
+                        manager.editEnquiry(editId, newMessage);
+                    }
                     break;
                 }
                 case 4 -> {
@@ -59,7 +64,12 @@ public class Main {
                 case 6 -> {
                     System.out.print("Enter Enquiry ID to delete: ");
                     int deleteId = Integer.parseInt(scanner.nextLine());
-                    manager.deleteEnquiry(deleteId);
+                    if (!manager.deleteCheck(deleteId)) {
+                        System.out.println("Enquiry cannot be deleted (either replied or not found).");
+                    }
+                    else {
+                        manager.deleteEnquiry(deleteId);
+                    }
                     break;
                 }
                 case 0 -> {
