@@ -1,4 +1,4 @@
-package group_project;
+package project;
 
 import enums.FlatType;
 
@@ -77,6 +77,11 @@ public class Project {
 	public void toggleVisibility() {
 		isVisible = !isVisible;
 	}
+	public void updateFlatSupply(FlatType flatType, int x) {
+		SimpleEntry<Integer, Double> entry = flatSupply.get(flatType);
+		flatSupply.put(flatType, new AbstractMap.SimpleEntry<>(entry.getKey() + x, entry.getValue()));
+	}
+	
 	public String toString() {
 		return "Project: " + projectName
 			     + "\nNeighbourhood: " + neighbourhood
