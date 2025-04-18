@@ -27,13 +27,23 @@ public class EnquiryManager {
         }
     }
 
-    public void deleteEnquiry(int enquiryId) {
-        boolean removed = enquiryList.removeIf(e -> e.getEnquiryId() == enquiryId);
-        if (removed) {
-            System.out.println("Enquiry deleted!");
-        } else {
-            System.out.println("Enquiry not found.");
+    public boolean deleteCheck(int id) {
+        for (int i = 0; i < enquiryList.size(); i++) {
+            Enquiry e = enquiryList.get(i);
+            if (e.getEnquiryId() == id) {
+                return !e.isReplied(); // Only deletable if not replied
+            }
         }
+        return false; // Not found or already replied
+    }
+
+    public void deleteEnquiry(int enquiryId) {
+            boolean removed = enquiryList.removeIf(e -> e.getEnquiryId() == enquiryId);
+            if (removed) {
+                System.out.println("Enquiry deleted!");
+            } else {
+                System.out.println("Enquiry not found.");
+            }
     }
 
     public void createEnquiryList(Enquiry enquiry) {
@@ -69,18 +79,23 @@ public class EnquiryManager {
         }
     }
 
+    public boolean editCheck(int id) {
+        for (int i = 0; i < enquiryList.size(); i++) {
+            Enquiry e = enquiryList.get(i);
+            if (e.getEnquiryId() == id) {
+                return !e.isReplied(); // Only editable if not replied
+            }
+        }
+        return false; // Not found or already replied
+    }
+
     public void editEnquiry(int id, String newMessage) {
         for (Enquiry e : enquiryList) {
             if (e.getEnquiryId() == id) {
-                if (e.isReplied()== true) {
-                    System.out.println("Sorry, Enquiry replied, unable to edit.");
-                }
-                else {
-                    e.setMessage(newMessage);
-                    System.out.println("Enquiry updated.");
-                    System.out.println("Date Created: " + e.getDateCreated());
-                    return;
-                }
+                e.setMessage(newMessage);
+                System.out.println("Enquiry updated.");
+                System.out.println("Date Created: " + e.getDateCreated());
+                return;
             }
         }
         System.out.println("Enquiry not found.");
