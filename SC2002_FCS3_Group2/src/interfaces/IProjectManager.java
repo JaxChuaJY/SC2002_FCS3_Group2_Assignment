@@ -24,6 +24,6 @@ public interface IProjectManager {
 
 	boolean removeProject(String nextLine);
 
-	void filterView(FilterSettings filters);
+	void filterView(FilterSettings filters, HDBManager user);
 	
 }

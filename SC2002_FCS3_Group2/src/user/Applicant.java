@@ -22,7 +22,7 @@ public class Applicant extends User {
 	public void setApplication(Application application) {
 		this.application = application;
 	}
-
+	
 	@Override
 	public void showMenu(BTOManagementSystem btoSys) {
 		Scanner sc = new Scanner(System.in);

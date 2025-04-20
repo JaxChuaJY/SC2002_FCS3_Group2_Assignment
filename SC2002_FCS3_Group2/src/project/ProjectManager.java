@@ -219,15 +219,28 @@ public class ProjectManager implements IProjectManager {
 			System.out.print(project.toString());
 		}
 	}
+	
 	public void viewAllProj(User user) {
 		if (user instanceof HDBManager) {
 			for (Project proj : projectList) {
 				System.out.print(proj.toString()+"\n");
 			}
 		}
-		else {
+		
+		else if (user instanceof HDBOfficer) {
 			for (Project proj : projectList) {
-				if (proj.getVisibility()) {
+				if (user.getMaritalStatus().canView(proj.getFlatTypes(), user.getAge())
+						&& proj.getVisibility()) {
+					System.out.println(proj.toString()+"\n");
+				}else if (proj.getOfficerList().contains( (HDBOfficer) user)) {
+					System.out.println(proj.toString()+"\n");
+				}
+			}
+		}	
+		else { 
+			for (Project proj : projectList) {
+				if (user.getMaritalStatus().canView(proj.getFlatTypes(), user.getAge())
+						&& proj.getVisibility()) {
 					System.out.print(proj.toString()+"\n");
 				}
 			}
@@ -246,7 +259,8 @@ public class ProjectManager implements IProjectManager {
 		return false;
 	}
 
-	public void filterView(FilterSettings filters) {
+	//Only used by the Manager 
+	public void filterView(FilterSettings filters, HDBManager user) {
 	    System.out.println("\n=== Filtered Projects ===");
 	    for (Project p : projectList) {                 
 	        // Filter by location
@@ -259,6 +273,11 @@ public class ProjectManager implements IProjectManager {
 	        if (filters.getFlatType() != null &&
 	            !p.getFlatTypes().contains(filters.getFlatType())) {
 	            continue;
+	        }
+	        
+	        //See all regardless if managing it? 
+	        if (!filters.getmanagerViewALL() && p.getManager().equals( (HDBManager) user) ) {
+	        	continue;
 	        }
 
 	        // Passed all filters

@@ -23,6 +23,7 @@ import registration.RegistrationForm;
 import user.Applicant;
 import user.HDBManager;
 import user.HDBOfficer;
+import user.User;
 import user.UserManager;
 
 public class BTOManagementSystem {
@@ -94,13 +95,14 @@ public class BTOManagementSystem {
 				System.out.println("\n=== Applicant/Officer Projects ===\n");
 				projectManager.viewAllProj(userManager.getcurrentUser());
 				System.out.print("\n");
-				System.out.print("Enter project you would like to view details (enter -1 to exit):");
+				System.out.print("Enter project's name you would like to view details (enter -1 to exit):");
 				String choice = sc.nextLine();
 				
 				if (choice.equalsIgnoreCase("-1")) {
 					break;
 				}
 				else if (projectManager.getProject(choice) != null) {
+					//Add create Enquiry here?
 					Project proj = projectManager.getProject(choice);
 					System.out.print(proj.toString());
 					System.out.print("\nDo you want to apply for this project? (Y/N): ");
@@ -126,19 +128,21 @@ public class BTOManagementSystem {
 		
 		else if (userManager.getcurrentUser() instanceof HDBManager) {
 			System.out.print("\n=== Manager Project Menu ===\n");
-			System.out.print("1. View all Projects\n");
-			System.out.print("2. View Filtered list of Projects\n");
+			System.out.print("1. View all Projects\n"); //add in able to EDIT
+			System.out.print("2. View Filtered list of Projects\n"); //add in able to EDIT
 			System.out.print("3. Create new Project\n");
 			System.out.print("4. Delete a Project\n");
+			//Toggle visibility
 			System.out.print("5. Exit\n");
 			int choice = sc.nextInt();
 			switch (choice) {
 			case 1:
 				System.out.println("\n=== All Projects List ===\n");
 				projectManager.viewAllProj(userManager.getcurrentUser());
+				//Add in Edit
 				break;
 			case 2:
-				projectManager.filterView(userManager.getcurrentUser().getFilters());	
+				projectManager.filterView(userManager.getcurrentUser().getFilters(), (HDBManager) userManager.getcurrentUser());	
 				break;
 			case 3:
 				projectManager.addProject((HDBManager)userManager.getcurrentUser());
@@ -225,7 +229,8 @@ public class BTOManagementSystem {
 		do {
 			System.out.println("**--Manager Registration Page");
 			System.out.println("1. Review pending registration applications");
-			System.out.println("2. Exit");
+			System.out.println("2. View all registrations");
+			System.out.println("3. Exit");
 
 			choice = sc.nextInt();
 
@@ -288,7 +293,9 @@ public class BTOManagementSystem {
 					}
 
 				} while (true);
-			case 2:
+			case 2:	projectRegManager.printList_ManagerFilter(user);
+					break;
+			case 3:
 				System.out.println("Exiting Registration Page...");
 				return;
 			default:
@@ -322,20 +329,6 @@ public class BTOManagementSystem {
 		}
 
 	}
-
-	// Application Menu section
-	/*
-	 * For Officer and Manager navigation: 1. Views all Project they are managing,
-	 * then select one 2. Once selected, choose between the choices
-	 * (book/print/approve-reject)
-	 * 
-	 * Feel free to redo this whole segment, it is very big and messy ;-; I think
-	 * the change in status does not have any file changes? Receipt is missing as
-	 * well
-	 * 
-	 * Booking function needs to affect the file and Applicant's typeofFlat, it also
-	 * needs to decrease the flatSupply in file + object
-	 */
 
 	public void showMenuApplicant(Applicant user) {
 		// Prints only 1 application? idk
@@ -428,7 +421,6 @@ public class BTOManagementSystem {
 		}
 	}
 
-	// Missing book and print function?
 	public void showMenuOfficer(HDBOfficer user) {
 
 		int choice = -1;
@@ -503,7 +495,6 @@ public class BTOManagementSystem {
 		} while (true);
 	}
 
-	// Copypasted from Officer just added switch choice of approve/reject
 	public void showMenuManager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 		int choice = -1;
@@ -836,6 +827,59 @@ public class BTOManagementSystem {
 
 			} //end of second while true
 		} //end of first while true
+	}
+	
+	//Filter Settings
+	public void showFilterMenu(User user) {
+		boolean manager = user instanceof HDBManager? true : false;
+		Scanner sc = new Scanner(System.in);
+		while(true) {
+			System.out.println("=====Filters=====");
+			System.out.println("1. Change location");
+			System.out.println("2. Filter flatTypes");
+			if (manager) {
+				System.out.println("3. See Projects Managed by others?");
+				System.out.println("4. Exit");
+			}else {
+				System.out.println("3. Exit");
+			}
+			
+			int choice = sc.nextInt();
+			
+			switch (choice) {
+			case 1: 
+				System.out.println("Please input location");
+				user.getFilters().setLocation(sc.next());
+				System.out.println("Location set!");
+				break;
+			case 2:
+				System.out.println("Please input FlatType ('2-room'/'3-room')");
+				//Check for invalid inputs!
+				user.getFilters().setFlatType(FlatType.fromString(sc.next()));
+				break;
+			case 3:
+				if (manager) {
+					System.out.println("See projects managed by others? (y/n)");
+					String input = sc.next();
+					if (input.toLowerCase().equals("y")) {
+						user.getFilters().setmanagerViewALL(true);
+						break;
+					}else if (input.toLowerCase().equals("n"))  {
+						user.getFilters().setmanagerViewALL(false);
+						break;
+					}else {
+						System.out.println("Invalid input");
+						break;
+					}
+				}else {
+					System.out.println("Exitting");
+					return;
+				}
+				
+				
+			}
+			
+		}
 	}
 
 	/**

@@ -188,12 +188,15 @@ public class ProjectRegistration implements IProjectRegistration{
 	}
 	
 	//REMOVE -- For checking
-	public void printList() {
+	public void printList_ManagerFilter(HDBManager user) {
 		
-		System.out.println("============ProjectRegistration PRINT ALL============");
+		System.out.println("============List of Pending/Approved Registrations============");
 		
 		for (RegistrationForm r: list) {
-			System.out.println(r);
+			if (r.getProject().getManager().equals(user) && (r.getStatus().equals(ApplicationStatus.PENDING) 
+					|| r.getStatus().equals(ApplicationStatus.SUCCESSFUL) )) {
+				System.out.println(r);
+			}
 		}
 	}
 	
