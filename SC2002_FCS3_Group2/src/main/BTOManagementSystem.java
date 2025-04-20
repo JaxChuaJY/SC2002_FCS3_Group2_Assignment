@@ -97,14 +97,70 @@ public class BTOManagementSystem {
 	 */
 
 	public void showProjMenu() {
-		/*
-		 * Applicant + Officer 1. View Filtered List and select a Project 2. Project
-		 * details is shown, ask if want to apply
-		 * 
-		 * Manager 1. Choose to view List or Create new Project 2. (View) View Filtered
-		 * List and select a Project 3. (View) Project details is shown,
-		 * Edit/Delete/Toggle 2. (Create) Create... lol
-		 */
+		
+		Scanner sc = new Scanner(System.in);
+		if (userManager.getcurrentUser() instanceof Applicant || userManager.getcurrentUser() instanceof HDBOfficer) {
+			while (true) {
+				System.out.println("\n=== Applicant/Officer Projects ===\n");
+				ProjectManager.viewAllProj(userManager.getcurrentUser());
+				System.out.print("\n");
+				System.out.print("Enter project you would like to view details (enter -1 to exit):");
+				String choice = sc.nextLine();
+				
+				if (choice.equalsIgnoreCase("-1")) {
+					break;
+				}
+				else if (ProjectManager.getProject(choice) != null) {
+					Project proj = ProjectManager.getProject(choice);
+					System.out.print(proj.toString());
+					System.out.print("\nDo you want to apply for this project? (Y/N): ");
+					String applyChoice = sc.nextLine();
+					if (applyChoice.equalsIgnoreCase("y")) {
+						System.out.print("\nEnter room type (2-room or 3-room)");
+						FlatType flatChoice = FlatTypeConverter(sc.nextLine());
+						ApplicationManager.createApplication(userManager.getcurrentUser(), ProjectManager.getProject(choice), flatChoice);
+					}
+					else if (applyChoice.equalsIgnoreCase("n")){
+						continue;
+					}
+					else {
+						System.out.print("Invalid input");
+						continue;
+					}
+				}
+				else {
+					System.out.print("\nProject not found");
+				}
+			}
+		}
+		
+		else if (userManager.getcurrentUser() instanceof HDBManager) {
+			System.out.print("\n=== Manager Project Menu ===\n");
+			System.out.print("1. View all Projects\n");
+			System.out.print("2. View Filtered list of Projects\n");
+			System.out.print("3. Create new Project\n");
+			System.out.print("4. Delete a Project\n");
+			System.out.print("5. Exit\n");
+			int choice = sc.nextInt();
+			switch (choice) {
+			case 1:
+				System.out.println("\n=== All Projects List ===\n");
+				ProjectManager.viewAllProj(userManager.getcurrentUser());
+				break;
+			case 2:
+				ProjectManager.filterView(filters);	
+				break;
+			case 3:
+				ProjectManager.addProject(userManager.getcurrentUser());
+				break;
+			case 4:
+				System.out.print("Enter Project name: ");
+				ProjectManager.removeProject(sc.nextLine());
+				break;
+			case 5:
+				return;
+			}
+		}
 	}
 
 	// -----Register Section
