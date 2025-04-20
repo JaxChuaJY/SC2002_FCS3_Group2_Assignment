@@ -36,7 +36,7 @@ public class ApplicationManager implements IApplicationManager {
 	private final IUserManager userManager;
 	private final IFileHandler fileHandler;
 
-	private static final String APPLICATIONS_FILE = "data/Applications.csv";
+	private static final String APPLICATIONS_FILE = "data/ApplicationList.csv";
 
 	/**
 	 * Constructs an ApplicationManager with the necessary dependencies.
