@@ -275,6 +275,20 @@ public class ProjectManager implements IProjectManager {
 			System.out.print(project.toString());
 		}
 	}
+	public void viewAllProj(User user) {
+		if (user instanceof HDBManager) {
+			for (Project proj : projectList) {
+				System.out.print(proj.toString()+"\n");
+			}
+		}
+		else {
+			for (Project proj : projectList) {
+				if (proj.getVisibility()) {
+					System.out.print(proj.toString()+"\n");
+				}
+			}
+		}
+	}
 	
 	public boolean removeProject(String projectName) {
 		Iterator<Project> iter = projectList.iterator();
