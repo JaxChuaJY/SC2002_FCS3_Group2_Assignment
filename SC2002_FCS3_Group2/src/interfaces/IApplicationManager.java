@@ -4,8 +4,11 @@ import project.Project;
 import user.User;
 import application.Application;
 import enums.FlatType;
+import enums.MaritalStatus;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 public interface IApplicationManager {
     // Load applications from a data source (e.g., CSV)
@@ -43,4 +46,6 @@ public interface IApplicationManager {
     void writeReceipt(Application application);
 
 	void viewReceipt(Application application);
+	
+	List<String> generateReport(Optional<MaritalStatus> maritalStatus, Optional<FlatType> flatType, OptionalInt minAge, OptionalInt maxAge, Optional<String> projectName);
 }

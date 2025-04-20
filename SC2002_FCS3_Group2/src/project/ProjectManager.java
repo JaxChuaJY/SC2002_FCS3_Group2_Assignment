@@ -201,6 +201,10 @@ public class ProjectManager implements IProjectManager {
 		LocalDate closeDate = LocalDate.parse(sc.next(), format);
 		System.out.print("\nEnter number of Officer Slots: ");
 		int offSlots = sc.nextInt();
+		do {
+			System.out.println("Officer Slot too big, enter again: ");
+			offSlots = sc.nextInt();
+		}while (offSlots > 10);
 		Project newProj = new Project(name, neighbourhood, flatMap, openDate, closeDate, offSlots);
 		newProj.addManager(manager);
 

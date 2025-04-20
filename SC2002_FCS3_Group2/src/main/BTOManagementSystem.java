@@ -1,9 +1,14 @@
 package main;
 
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import application.Application;
@@ -12,6 +17,7 @@ import enquiry.Enquiry;
 import enquiry.EnquiryManager;
 import enums.ApplicationStatus;
 import enums.FlatType;
+import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
@@ -28,26 +34,23 @@ import user.UserManager;
 
 public class BTOManagementSystem {
 	private IUserManager userManager;
-    private IProjectManager projectManager;
-    private ProjectRegistration projectRegManager; 
-    private IApplicationManager applicationManager;
+	private IProjectManager projectManager;
+	private ProjectRegistration projectRegManager;
+	private IApplicationManager applicationManager;
 	private IFileHandler fileHandler;
 	private EnquiryManager enquiryManager;
-	
 
 	BTOManagementSystem() {
 		fileHandler = new FileHandler();
 		userManager = new UserManager(fileHandler);
 		projectManager = new ProjectManager(fileHandler, userManager);
 		projectRegManager = new ProjectRegistration(userManager, projectManager);
-		
 		applicationManager = new ApplicationManager(projectManager, userManager, fileHandler);
 		enquiryManager = new EnquiryManager();
 	}
 
 	public void startSystem() {
 		userManager.printAllUser();
-		applicationManager.loadApplicationFromCSV();
 		login();
 		if (userManager.getcurrentUser() != null) {
 			System.out.println(userManager.getcurrentUser());
@@ -102,7 +105,6 @@ public class BTOManagementSystem {
 					break;
 				}
 				else if (projectManager.getProject(choice) != null) {
-					//Add create Enquiry here?
 					Project proj = projectManager.getProject(choice);
 					System.out.print(proj.toString());
 					System.out.print("\nDo you want to apply for this project? (Y/N): ");
@@ -127,19 +129,49 @@ public class BTOManagementSystem {
 		}
 		
 		else if (userManager.getcurrentUser() instanceof HDBManager) {
-			System.out.print("\n=== Manager Project Menu ===\n");
-			System.out.print("1. View all Projects\n"); //add in able to EDIT
-			System.out.print("2. View Filtered list of Projects\n"); //add in able to EDIT
-			System.out.print("3. Create new Project\n");
-			System.out.print("4. Delete a Project\n");
-			//Toggle visibility
-			System.out.print("5. Exit\n");
-			int choice = sc.nextInt();
-			switch (choice) {
-			case 1:
-				System.out.println("\n=== All Projects List ===\n");
-				projectManager.viewAllProj(userManager.getcurrentUser());
-				//Add in Edit
+			while (true) {
+				System.out.print("\n=== Manager Project Menu ===\n");
+				System.out.print("1. View all Projects\n"); 
+				System.out.print("2. View Filtered list of Projects\n"); 
+				System.out.print("3. Create new Project\n");
+				System.out.print("4. Delete a Project\n");
+				System.out.print("5. Exit\n");
+				int choice = sc.nextInt();
+				switch (choice) {
+				case 1:
+					System.out.println("\n=== All Projects List ===\n");
+					projectManager.viewAllProj(userManager.getcurrentUser());
+					System.out.print("\n");
+					System.out.print("Enter project's name you would like to view details (enter -1 to exit):");
+					String str_input = sc.nextLine();
+					
+					if (str_input.equalsIgnoreCase("-1")) {
+						break;
+					}
+					else if (projectManager.getProject(str_input) != null) {
+						Project proj = projectManager.getProject(str_input);
+						System.out.print(proj.toString());
+						
+						System.out.println("Input action [EDIT/TOGGLE_VIS/BACK]:");
+						str_input = sc.next();
+						
+						while(true) {
+							if (str_input.toUpperCase().equals("EDIT")) {
+								//edit function;
+								//need write into file
+							} else if (str_input.toUpperCase().equals("TOGGLE_VIS")) {
+								//toggle
+								//need write into file
+							} else if (str_input.toUpperCase().equals("BACK")){
+								System.out.println("Going back...");
+								break;
+							}
+						}
+					}
+					else {
+						System.out.print("\nProject not found");
+					}
+
 				break;
 			case 2:
 				projectManager.filterView(userManager.getcurrentUser().getFilters(), (HDBManager) userManager.getcurrentUser());	
@@ -153,6 +185,10 @@ public class BTOManagementSystem {
 				break;
 			case 5:
 				return;
+			default:
+				System.out.println("Invalid input");
+				break;
+				}
 			}
 		}
 	}
@@ -293,8 +329,9 @@ public class BTOManagementSystem {
 					}
 
 				} while (true);
-			case 2:	projectRegManager.printList_ManagerFilter(user);
-					break;
+			case 2:
+				projectRegManager.printList_ManagerFilter(user);
+				break;
 			case 3:
 				System.out.println("Exiting Registration Page...");
 				return;
@@ -362,7 +399,6 @@ public class BTOManagementSystem {
 	            applicationManager.requestWithdrawal(application);
 	            applicationManager.saveApplicationtoCSV();
 	            System.out.println("Withdrawal Request Sent.");
-	            System.out.println(applicationManager.getApplicationsForUser(user));
 	        } else {
 	            List<Project> projectList = projectManager.getProjectList(user);
 	            int listSize = projectList.size();
@@ -381,22 +417,31 @@ public class BTOManagementSystem {
 				}
 				System.out.println("-".repeat(27));
 				System.out.println((listSize + 1) + ". EXIT");
+				
 				choice = sc.nextInt();
+				
 				if (1 <= choice && choice <= listSize) {
 					Project selected = projectList.get(choice - 1);
-					List<FlatType> flatTypeList = new ArrayList<>(selected.getFlatTypes());
+					EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply = selected.getFlatSupply();
 
-					System.out.println("\nAvailable Flat Types:");
-					IntStream.range(0, flatTypeList.size())
-							.forEach(i -> System.out.println((i + 1) + ". " + flatTypeList.get(i)));
+				   // Filter flat types based on marital status and age
+				    List<FlatType> viewableFlatTypes = flatSupply.keySet().stream()
+				        .filter(ft -> user.getMaritalStatus().canView(Set.of(ft), user.getAge()))
+				        .toList();
+
+				    // Display the eligible flat types
+				    for (int i = 0; i < viewableFlatTypes.size(); i++) {
+				        FlatType type = viewableFlatTypes.get(i);
+				        SimpleEntry<Integer, Double> info = flatSupply.get(type);
+				        System.out.printf("%d. %s - Supply: %d, Cost: $%.2f%n", i + 1, type, info.getKey(), info.getValue());
+				    }
 
 				    System.out.print("Select a flat type: ");
 				    int flatChoice = sc.nextInt();
-				    if (flatChoice >= 1 && flatChoice <= flatTypeList.size()) {
-				        if (selected.getFlatSupply().containsKey(flatTypeList.get(flatChoice - 1))) {
-
-				            if (selected.getFlatSupply().get(flatTypeList.get(flatChoice - 1)).getKey() > 0) {
-				                applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
+				    if (flatChoice >= 1 && flatChoice <= viewableFlatTypes.size()) {
+				        if (selected.getFlatSupply().containsKey(viewableFlatTypes.get(flatChoice - 1))) {
+				        	if (selected.getFlatSupply().get(viewableFlatTypes.get(flatChoice - 1)).getKey() > 0) {
+				                applicationManager.createApplication(user, selected, viewableFlatTypes.get(flatChoice - 1));
 				                applicationManager.saveApplicationtoCSV();
 				                System.out.println("Application sent. Please wait for approval.");
 				            } else {
@@ -420,7 +465,7 @@ public class BTOManagementSystem {
 			break;
 		}
 	}
-
+	
 	public void showMenuOfficer(HDBOfficer user) {
 
 		int choice = -1;
@@ -554,49 +599,49 @@ public class BTOManagementSystem {
 
 				Application application = applications.get(choice - 1);
 
-	            while (true) {
-	                if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
-	                    System.out.println("1. Approve Withdrawal");
-	                    System.out.println("2. Reject Withdrawal");
-	                    System.out.println("3. Back");
-	                } else {
-	                    System.out.println("1. Approve Application");
-	                    System.out.println("2. Reject Application");
-	                    System.out.println("3. Back");
-	                }
-                	choice = sc.nextInt();
-                    sc.nextLine();
+				while (true) {
+					if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+						System.out.println("1. Approve Withdrawal");
+						System.out.println("2. Reject Withdrawal");
+						System.out.println("3. Back");
+					} else {
+						System.out.println("1. Approve Application");
+						System.out.println("2. Reject Application");
+						System.out.println("3. Back");
+					}
+					choice = sc.nextInt();
+					sc.nextLine();
 
-	                if (choice == 1) {
-	                    if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
-	                        applicationManager.approveWithdrawal(application);
-	                        System.out.println("Withdrawal approved.");
-	                    } else {
-	                        applicationManager.approveApplication(application);
-	                        System.out.println("Application approved.");
-	                    }
-	                    applicationManager.saveApplicationtoCSV();
-	                    break;
-	                } else if (choice == 2) {
-	                    if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
-	                        applicationManager.rejectWithdrawal(application);
-	                        System.out.println("Withdrawal rejected.");
-	                    } else {
-	                        applicationManager.rejectApplication(application);
-	                        System.out.println("Application rejected.");
-	                    }
-	                    applicationManager.saveApplicationtoCSV();
-	                    break;
-	                } else if (choice == 3) {
-	                    System.out.println("Returning to application list.");
-	                    break;
-	                } else {
-	                    System.out.println("Try again.");
-	                }
-	                
-	            }
-	        }
-	    }
+					if (choice == 1) {
+						if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+							applicationManager.approveWithdrawal(application);
+							System.out.println("Withdrawal approved.");
+						} else {
+							applicationManager.approveApplication(application);
+							System.out.println("Application approved.");
+						}
+						applicationManager.saveApplicationtoCSV();
+						break;
+					} else if (choice == 2) {
+						if (application.getStatus() == ApplicationStatus.WITHDRAW_REQUEST) {
+							applicationManager.rejectWithdrawal(application);
+							System.out.println("Withdrawal rejected.");
+						} else {
+							applicationManager.rejectApplication(application);
+							System.out.println("Application rejected.");
+						}
+						applicationManager.saveApplicationtoCSV();
+						break;
+					} else if (choice == 3) {
+						System.out.println("Returning to application list.");
+						break;
+					} else {
+						System.out.println("Try again.");
+					}
+
+				}
+			}
+		}
 	}
 
 	// -----Enquiry Section
@@ -763,12 +808,12 @@ public class BTOManagementSystem {
 					System.out.println("Try again for input");
 				}
 
-			} //end of second while true
-		} //end of first while true
+			} // end of second while true
+		} // end of first while true
 
 	}
 
-	//Copy pasted from Officer.
+	// Copy pasted from Officer.
 	public void showEnquiryManager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 
@@ -825,36 +870,80 @@ public class BTOManagementSystem {
 					System.out.println("Try again for input");
 				}
 
-			} //end of second while true
-		} //end of first while true
+			} // end of second while true
+		} // end of first while true
 	}
+
+	//-----Report
+	public void showReportMenu() {
+ 		System.out.println("=====Application Report Filter=====");
+ 		
+ 		Scanner sc = new Scanner(System.in);
+ 		Optional<MaritalStatus> maritalStatus = Optional.empty();
+ 		Optional<FlatType> flatType = Optional.empty();
+ 		OptionalInt minAge = OptionalInt.empty();
+ 		OptionalInt maxAge = OptionalInt.empty();
+ 		Optional<String> projectName = Optional.empty();
+ 		String input;
+ 		try {
+ 			System.out.print("Marital Status (e.g. MARRIED/SINGLE or leave blank): ");
+ 			input = sc.nextLine().trim();
+ 			maritalStatus = input.isEmpty() ? Optional.empty() : Optional.of(MaritalStatus.valueOf(input.toUpperCase()));
+ 			
+ 			// Flat type
+ 			System.out.print("Flat Type (e.g. TWO_ROOM, THREE_ROOM or leave blank): ");
+ 			input = sc.nextLine().trim();
+ 			flatType = input.isEmpty() ? Optional.empty() : Optional.of(FlatType.valueOf(input.toUpperCase()));
+ 			
+ 			// Age range
+ 			System.out.print("Minimum age (or leave blank): ");
+ 			input = sc.nextLine().trim();
+ 			minAge = input.isEmpty() ? OptionalInt.empty() : OptionalInt.of(Integer.parseInt(input));
+ 			
+ 			System.out.print("Maximum age (or leave blank): ");
+ 			input = sc.nextLine().trim();
+ 			maxAge = input.isEmpty() ? OptionalInt.empty() : OptionalInt.of(Integer.parseInt(input));
+ 			
+ 			// Project name
+ 			System.out.print("Project Name (or leave blank): ");
+ 			input = sc.nextLine().trim();
+ 			projectName = input.isEmpty() ? Optional.empty() : Optional.of(input);
+ 			
+ 			List<String> report = applicationManager.generateReport(maritalStatus, flatType, minAge, maxAge, projectName);
+ 			System.out.println("\n=====Filtered Application Report=====");
+ 			report.forEach(System.out::println);
+         } catch (Exception e) {
+             System.out.println("Invalid filter.");
+         }
+ 
+ 	}
 	
-	//Filter Settings
+	//-----Filter Settings
 	public void showFilterMenu(User user) {
-		boolean manager = user instanceof HDBManager? true : false;
+		boolean manager = user instanceof HDBManager ? true : false;
 		Scanner sc = new Scanner(System.in);
-		while(true) {
+		while (true) {
 			System.out.println("=====Filters=====");
 			System.out.println("1. Change location");
 			System.out.println("2. Filter flatTypes");
 			if (manager) {
 				System.out.println("3. See Projects Managed by others?");
 				System.out.println("4. Exit");
-			}else {
+			} else {
 				System.out.println("3. Exit");
 			}
-			
+
 			int choice = sc.nextInt();
-			
+
 			switch (choice) {
-			case 1: 
+			case 1:
 				System.out.println("Please input location");
 				user.getFilters().setLocation(sc.next());
 				System.out.println("Location set!");
 				break;
 			case 2:
 				System.out.println("Please input FlatType ('2-room'/'3-room')");
-				//Check for invalid inputs!
+				// Check for invalid inputs!
 				user.getFilters().setFlatType(FlatType.fromString(sc.next()));
 				break;
 			case 3:
@@ -864,21 +953,20 @@ public class BTOManagementSystem {
 					if (input.toLowerCase().equals("y")) {
 						user.getFilters().setmanagerViewALL(true);
 						break;
-					}else if (input.toLowerCase().equals("n"))  {
+					} else if (input.toLowerCase().equals("n")) {
 						user.getFilters().setmanagerViewALL(false);
 						break;
-					}else {
+					} else {
 						System.out.println("Invalid input");
 						break;
 					}
-				}else {
+				} else {
 					System.out.println("Exitting");
 					return;
 				}
-				
-				
+
 			}
-			
+
 		}
 	}
 

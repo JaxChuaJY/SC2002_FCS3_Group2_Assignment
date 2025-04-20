@@ -38,6 +38,16 @@ public class Enquiry {
     public void setMessage(String message) {
         this.message = message;
     }
+    
+    public String getDateReplied() { return (dateReplied == null) ? "" : dateReplied.format(a); }
+    
+    public void setDateCreated(LocalDate dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public void setDateReplied(LocalDate dateReplied) {
+        this.dateReplied = dateReplied;
+    }
 
     public User getSender() { return sender; }
     public Project getProject() { return project; }
@@ -45,7 +55,6 @@ public class Enquiry {
     public int getEnquiryId() { return enquiryId; }
     public boolean isReplied() { return replied; }
     public String getDateCreated() { return dateCreated.format(a); }
-    public String getDateReplied() {return dateReplied.format(a); }
     public String getReply() { return reply; }
 
     @Override

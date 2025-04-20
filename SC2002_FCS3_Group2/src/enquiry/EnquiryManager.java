@@ -1,78 +1,202 @@
 package enquiry;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import interfaces.IProjectManager;
+import interfaces.IUserManager;
 import project.Project;
 import user.User;
 
 public class EnquiryManager {
-    private List<Enquiry> enquiryList;
+	private List<Enquiry> enquiryList;
+	private static final DateTimeFormatter a = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public EnquiryManager() {
-        enquiryList = new ArrayList<>();
-    }
+	public EnquiryManager() {
+		enquiryList = new ArrayList<>();
+	}
 
-    public void addEnquiry(User sender, Project project, String message) {
-        Enquiry e = new Enquiry(sender, project, message);
-        enquiryList.add(e);
-        System.out.println("Date Created: " + e.getDateCreated());
-        //System.out.println("Enquiry added with ID: " + e.getEnquiryId());
-    }
+	// File-related functions
 
-    public void printAll() {
-        if (enquiryList.isEmpty()) {
-            System.out.println("No enquiries.");
-        } else {
-            for (int i = 0; i < enquiryList.size(); i++) {
-                Enquiry e = enquiryList.get(i);
-                System.out.println( "[" + (i + 1) + "] " + e.getSender() + " - " + e.getMessage());
-                System.out.println("Reply: " + e.getReply());
-            }
-        }
-    }
-    
-    public List<Enquiry> getEnquiry_filterSend(User user) {
-    	return enquiryList.stream().filter(en -> en.getSender().equals(user.getName()))
-    			.collect(Collectors.toList());
-    }
+	public void loadFromCSV(String filename, IUserManager userManager, IProjectManager projectManager) {
+		File file = new File(filename);
 
-    public boolean deleteCheck(int id) {
-        for (int i = 0; i < enquiryList.size(); i++) {
-            Enquiry e = enquiryList.get(i);
-            if (e.getEnquiryId() == id) {
-                return !e.isReplied(); // Only deletable if not replied
-            }
-        }
-        return false; // Not found or already replied
-    }
+		if (!file.exists()) {
+			System.out.println("CSV file not found. Creating an empty file.");
+			try (FileWriter writer = new FileWriter(filename)) {
+				writer.write("EnquiryId,Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+			} catch (IOException e) {
+				System.out.println("Error creating CSV file: " + e.getMessage());
+			}
+			return; // keep the current enquiryList (not replaced)
+		}
 
-    public void createEnquiryList(Enquiry enquiry) {
-        enquiryList.add(enquiry);
-    }
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+			String line = br.readLine(); // skip header
+			while ((line = br.readLine()) != null) {
+				String[] parts = parseCSVLine(line);
+				if (parts.length >= 7) {
+					// String sender = parts[0];
+					// String project = parts[1];
+					User u;
+					try {
+						u = userManager.searchUser_Type(User.class, parts[0]);
+						Project p = projectManager.getProject(parts[1]);
+						String message = parts[2];
+						String reply = parts[3];
+						LocalDate dateCreated = LocalDate.parse(parts[4], a);
+						LocalDate dateReplied = parts[5].isEmpty() ? null : LocalDate.parse(parts[5], a);
+						boolean replied = Boolean.parseBoolean(parts[6]);
 
-    public Enquiry getEnquiryByProject(Project project) {
-        for (Enquiry e : enquiryList) {
-            if (e.getProject().getProjectName().equalsIgnoreCase(project.getProjectName())) {
-                return e;
-            }
-        }
-        return null;
-    }
+						Enquiry e = new Enquiry(u, p, message);
+						e.setMessage(message);
+						if (replied) {
+							e.setReply(reply);
+							e.setDateReplied(dateReplied);
+						}
+						e.setDateCreated(dateCreated);
+						enquiryList.add(e);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-    public List<Enquiry> getEnquiryNOReply(Project project) {
-        List<Enquiry> proj = new ArrayList<>();
+				}
+			}
+			System.out.println("Loaded enquiries from " + filename);
+		} catch (IOException e) {
+			System.out.println("Error reading CSV: " + e.getMessage());
+		}
+	}
 
-        for (Enquiry e : enquiryList) {
-            if (e.getProject().getProjectName().equalsIgnoreCase(project.getProjectName())) {
-                proj.add(e);
-            }
-        }
-        if (proj.isEmpty()) {
-            System.out.println("No enquiries found for this project.");
-        } 
-        
+	private String[] parseCSVLine(String line) {
+		List<String> tokens = new ArrayList<>();
+		StringBuilder current = new StringBuilder();
+		boolean inQuotes = false;
+
+		for (int i = 0; i < line.length(); i++) {
+			char ch = line.charAt(i);
+
+			if (ch == '\"') {
+				if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '\"') {
+					current.append('\"'); // escaped quote
+					i++;
+				} else {
+					inQuotes = !inQuotes; // toggle quote mode
+				}
+			} else if (ch == ',' && !inQuotes) {
+				tokens.add(current.toString());
+				current.setLength(0);
+			} else {
+				current.append(ch);
+			}
+		}
+
+		tokens.add(current.toString()); // add last field
+		return tokens.toArray(new String[0]);
+	}
+
+	public void exportToCSV(String filename) {
+		try (FileWriter writer = new FileWriter(filename)) {
+			// Write CSV header
+			writer.write("Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+
+			for (Enquiry e : enquiryList) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(escapeCSV(e.getSender().getName())).append(",");
+				sb.append(escapeCSV(e.getProject().getProjectName())).append(",");
+				sb.append(escapeCSV(e.getMessage())).append(",");
+				sb.append(escapeCSV(e.getReply())).append(",");
+				sb.append(e.getDateCreated()).append(",");
+				sb.append(e.getDateReplied() == null ? "" : e.getDateReplied()).append(",");
+				sb.append(e.isReplied());
+				writer.write(sb.toString());
+				writer.write("\n");
+			}
+
+			System.out.println("Enquiries exported to: " + filename);
+		} catch (IOException e) {
+			System.out.println("Error writing to CSV file: " + e.getMessage());
+		}
+	}
+
+	private String escapeCSV(String field) {
+		if (field == null)
+			return "";
+		if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
+			field = field.replace("\"", "\"\"");
+			return "\"" + field + "\"";
+		}
+		return field;
+	}
+
+	// End of file-related functions
+	public void addEnquiry(User sender, Project project, String message) {
+		Enquiry e = new Enquiry(sender, project, message);
+		enquiryList.add(e);
+		System.out.println("Date Created: " + e.getDateCreated());
+		// System.out.println("Enquiry added with ID: " + e.getEnquiryId());
+	}
+
+	public void printAll() {
+		if (enquiryList.isEmpty()) {
+			System.out.println("No enquiries.");
+		} else {
+			for (int i = 0; i < enquiryList.size(); i++) {
+				Enquiry e = enquiryList.get(i);
+				System.out.println("[" + (i + 1) + "] " + e.getSender() + " - " + e.getMessage());
+				System.out.println("Reply: " + e.getReply());
+			}
+		}
+	}
+
+	public List<Enquiry> getEnquiry_filterSend(User user) {
+		return enquiryList.stream().filter(en -> en.getSender().equals(user.getName())).collect(Collectors.toList());
+	}
+
+	public boolean deleteCheck(int id) {
+		for (int i = 0; i < enquiryList.size(); i++) {
+			Enquiry e = enquiryList.get(i);
+			if (e.getEnquiryId() == id) {
+				return !e.isReplied(); // Only deletable if not replied
+			}
+		}
+		return false; // Not found or already replied
+	}
+
+	public void createEnquiryList(Enquiry enquiry) {
+		enquiryList.add(enquiry);
+	}
+
+	public Enquiry getEnquiryByProject(Project project) {
+		for (Enquiry e : enquiryList) {
+			if (e.getProject().getProjectName().equalsIgnoreCase(project.getProjectName())) {
+				return e;
+			}
+		}
+		return null;
+	}
+
+	public List<Enquiry> getEnquiryNOReply(Project project) {
+		List<Enquiry> proj = new ArrayList<>();
+
+		for (Enquiry e : enquiryList) {
+			if (e.getProject().getProjectName().equalsIgnoreCase(project.getProjectName())) {
+				proj.add(e);
+			}
+		}
+		if (proj.isEmpty()) {
+			System.out.println("No enquiries found for this project.");
+		}
+
 //        else {
 //            System.out.println("Enquiries for project: " + project);
 //            for (int i = 0; i < proj.size(); i++) {
@@ -81,36 +205,34 @@ public class EnquiryManager {
 //                System.out.println("Reply: " + e.getReply());
 //            }
 //        }
-        return proj;
-    }
+		return proj;
+	}
 
-    public void editEnquiry(int id, String newMessage) {
-        for (Enquiry e : enquiryList) {
-            if (e.getEnquiryId() == id) {
-                if (e.isReplied()== true) {
-                    System.out.println("Sorry, Enquiry replied, unable to edit.");
-                }
-                else {
-                    e.setMessage(newMessage);
-                    System.out.println("Enquiry updated.");
-                    System.out.println("Date Created: " + e.getDateCreated());
-                    return;
-                }
-            }
-        }
-        System.out.println("Enquiry not found.");
-    }
+	public void editEnquiry(int id, String newMessage) {
+		for (Enquiry e : enquiryList) {
+			if (e.getEnquiryId() == id) {
+				if (e.isReplied() == true) {
+					System.out.println("Sorry, Enquiry replied, unable to edit.");
+				} else {
+					e.setMessage(newMessage);
+					System.out.println("Enquiry updated.");
+					System.out.println("Date Created: " + e.getDateCreated());
+					return;
+				}
+			}
+		}
+		System.out.println("Enquiry not found.");
+	}
 
-    public void replyToEnquiry(int id, String reply) {
-        for (Enquiry e : enquiryList) {
-            if (e.getEnquiryId() == id) {
-                e.setReply(reply);
-                System.out.println("Reply saved.");
-                return;
-            }
-        }
-        System.out.println("Enquiry not found.");
-    }
-    
+	public void replyToEnquiry(int id, String reply) {
+		for (Enquiry e : enquiryList) {
+			if (e.getEnquiryId() == id) {
+				e.setReply(reply);
+				System.out.println("Reply saved.");
+				return;
+			}
+		}
+		System.out.println("Enquiry not found.");
+	}
 
 }

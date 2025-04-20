@@ -52,6 +52,8 @@ public class HDBManager extends User {
 					btoSys.showRegMenu();
 					break;
 				case 6:
+					btoSys.showReportMenu();
+ 					break;
 				case 7:
 					btoSys.logout();
 					return;
