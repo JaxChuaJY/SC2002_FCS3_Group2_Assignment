@@ -6,11 +6,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import enums.ApplicationStatus;
 import enums.FlatType;
+import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
@@ -32,9 +35,9 @@ public class ApplicationManager implements IApplicationManager {
 
 	private Map<String, Set<Application>> applicationList;
 
-	private final IProjectManager projectManager;
-	private final IUserManager userManager;
-	private final IFileHandler fileHandler;
+	private IProjectManager projectManager;
+	private IUserManager userManager;
+	private IFileHandler fileHandler;
 
 	private static final String APPLICATIONS_FILE = "data/ApplicationList.csv";
 
@@ -45,12 +48,12 @@ public class ApplicationManager implements IApplicationManager {
 	 * @param userManager    the user manager to access user data
 	 * @param fileHandler    the file handler to read application data from CSV
 	 */
-	public ApplicationManager(IProjectManager projectManager, IUserManager userManager, IFileHandler fH) {
-		this.projectManager = projectManager;
-		this.userManager = userManager;
-		this.fileHandler = fH;
-		this.applicationList = new HashMap<>();
-		loadApplicationFromCSV();
+	public ApplicationManager(IProjectManager projectManager, IUserManager userManager, IFileHandler fileHandler) {
+	    this.projectManager = projectManager;
+	    this.userManager = userManager;
+	    this.fileHandler = fileHandler;
+	    this.applicationList = new HashMap<>();
+	    loadApplicationFromCSV();
 	}
 
 	/**
@@ -305,5 +308,44 @@ public class ApplicationManager implements IApplicationManager {
 		
 		String fileName = "receipt/receipt_" + application.getApplicant().getNric() + ".txt";
 		fileHandler.readFromFile(fileName).stream().forEach(System.out::println);
+	}
+	
+	@Override
+	public List<String> generateReport(Optional<MaritalStatus> maritalStatus,
+							            Optional<FlatType> flatType,
+							            OptionalInt minAge,
+							            OptionalInt maxAge,
+							            Optional<String> projectName) {
+		List<String> reportList  = new ArrayList<>();
+        
+
+        applicationList.values().stream()
+            .flatMap(Set::stream)
+            .map(Application::getApplicant)
+            .filter(applicant -> maritalStatus.map(ms -> applicant.getMaritalStatus() == ms).orElse(true))
+            .filter(applicant -> flatType.map(ft -> applicant.getApplication().getFlatType() == ft).orElse(true))
+            .filter(applicant -> minAge.isPresent() ? applicant.getAge() >= minAge.getAsInt() : true)
+            .filter(applicant -> maxAge.isPresent() ? applicant.getAge() <= maxAge.getAsInt() : true)
+            .filter(applicant -> projectName.map(pn -> pn.equalsIgnoreCase(applicant.getApplication().getProject().getProjectName())).orElse(true))
+            .forEach(applicant -> {
+                String line = String.join(",",
+                    applicant.getNric(),
+                    applicant.getName(),
+                    String.valueOf(applicant.getAge()),
+                    applicant.getMaritalStatus().toString(),
+                    applicant.getApplication().getProject().getProjectName(),
+                    applicant.getApplication().getFlatType().toString()
+                );
+                reportList.add(line);
+            });
+        
+        if (reportList.isEmpty()) {
+        	reportList.add("No such applications.");
+        }
+        else {
+        	reportList.add(0,"NRIC,Name,Age,Marital Status,Project Name,Flat Type");
+        }
+        
+        return reportList;
 	}
 }

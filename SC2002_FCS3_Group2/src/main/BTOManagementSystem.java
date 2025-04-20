@@ -5,6 +5,8 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -15,6 +17,7 @@ import enquiry.Enquiry;
 import enquiry.EnquiryManager;
 import enums.ApplicationStatus;
 import enums.FlatType;
+import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
@@ -810,6 +813,49 @@ public class BTOManagementSystem {
 	 */
 	public ProjectRegistration getProjectRegManager() {
 		return projectRegManager;
+	}
+
+	public void showReportMenu() {
+		System.out.println("=====Application Report Filter=====");
+		
+		Scanner sc = new Scanner(System.in);
+		Optional<MaritalStatus> maritalStatus = Optional.empty();
+		Optional<FlatType> flatType = Optional.empty();
+		OptionalInt minAge = OptionalInt.empty();
+		OptionalInt maxAge = OptionalInt.empty();
+		Optional<String> projectName = Optional.empty();
+		String input;
+		try {
+			System.out.print("Marital Status (e.g. MARRIED/SINGLE or leave blank): ");
+			input = sc.nextLine().trim();
+			maritalStatus = input.isEmpty() ? Optional.empty() : Optional.of(MaritalStatus.valueOf(input.toUpperCase()));
+			
+			// Flat type
+			System.out.print("Flat Type (e.g. TWO_ROOM, THREE_ROOM or leave blank): ");
+			input = sc.nextLine().trim();
+			flatType = input.isEmpty() ? Optional.empty() : Optional.of(FlatType.valueOf(input.toUpperCase()));
+			
+			// Age range
+			System.out.print("Minimum age (or leave blank): ");
+			input = sc.nextLine().trim();
+			minAge = input.isEmpty() ? OptionalInt.empty() : OptionalInt.of(Integer.parseInt(input));
+			
+			System.out.print("Maximum age (or leave blank): ");
+			input = sc.nextLine().trim();
+			maxAge = input.isEmpty() ? OptionalInt.empty() : OptionalInt.of(Integer.parseInt(input));
+			
+			// Project name
+			System.out.print("Project Name (or leave blank): ");
+			input = sc.nextLine().trim();
+			projectName = input.isEmpty() ? Optional.empty() : Optional.of(input);
+			
+			List<String> report = applicationManager.generateReport(maritalStatus, flatType, minAge, maxAge, projectName);
+			System.out.println("\n=====Filtered Application Report=====");
+			report.forEach(System.out::println);
+        } catch (Exception e) {
+            System.out.println("Invalid filter.");
+        }
+
 	}
 
 }
