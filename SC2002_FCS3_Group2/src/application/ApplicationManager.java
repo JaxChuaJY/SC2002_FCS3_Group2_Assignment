@@ -85,7 +85,8 @@ public class ApplicationManager implements IApplicationManager {
 				.flatMap(Set::stream)
 				.map(data -> data.fileFormat())
 				.collect(Collectors.toCollection(ArrayList::new));
-
+		
+		
 		fileFormat.add(0, "Project Name,Applicant,FlatType,ApplicationStatus,PreviousStatus");
 		fileHandler.writeToFile(APPLICATIONS_FILE,fileFormat);
 	}
@@ -137,14 +138,20 @@ public class ApplicationManager implements IApplicationManager {
 			throw new IllegalArgumentException("Cannot apply for a project you are managing.");
 		}
 		
-		if (applicant.getApplication() != null && 
-				(applicant.getApplication().getStatus() == ApplicationStatus.WITHDRAWN
-				|| applicant.getApplication().getStatus() == ApplicationStatus.UNSUCCESSFUL)) {
-			Set<Application> projectApps = applicationList.get(applicant.getApplication().getProject().getProjectName());
-	        if (projectApps != null) {
-	            projectApps.remove(applicant.getApplication());
-	        }
+		boolean hasExistingApplication = false;
+
+		// Iterate through all the sets of applications in applicationList
+		for (Set<Application> applications : applicationList.values()) {
+		    // Check if there are any applications for the applicant
+		    if (applications.removeIf(app -> app.getApplicant().equals(applicant))) {
+		        hasExistingApplication = true;  // If we removed any, set flag to true
+		    }
 		}
+
+		// Check if the applicant had an existing application
+		if (hasExistingApplication) {
+		    System.out.println("Existing applications have been removed.");
+		} 
 		Application a = new Application(applicant, project, flatType, ApplicationStatus.PENDING, ApplicationStatus.PENDING);
 		applicationList.computeIfAbsent(project.getProjectName(), k -> new HashSet<>()).add(a);
 		applicant.setApplication(a);
@@ -158,8 +165,11 @@ public class ApplicationManager implements IApplicationManager {
 	 */
 	@Override
 	public Application getApplicationsForUser(User user) {
-		return applicationList.values().stream().flatMap(Set::stream)
-				.filter(a -> a.getApplicant().getNric().equals(user.getNric())).toList().getFirst();
+	    return applicationList.values().stream()
+	        .flatMap(Set::stream)
+	        .filter(a -> a.getApplicant().getNric().equals(user.getNric()))
+	        .findFirst()
+	        .orElse(null);  // Return null if no application is found
 	}
 
 	/**

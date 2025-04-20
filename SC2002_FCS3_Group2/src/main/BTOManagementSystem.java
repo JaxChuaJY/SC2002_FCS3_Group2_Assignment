@@ -1,9 +1,12 @@
 package main;
 
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import application.Application;
@@ -45,7 +48,6 @@ public class BTOManagementSystem {
 
 	public void startSystem() {
 		userManager.printAllUser();
-		applicationManager.loadApplicationFromCSV();
 		login();
 		if (userManager.getcurrentUser() != null) {
 			System.out.println(userManager.getcurrentUser());
@@ -312,7 +314,6 @@ public class BTOManagementSystem {
 	            applicationManager.requestWithdrawal(application);
 	            applicationManager.saveApplicationtoCSV();
 	            System.out.println("Withdrawal Request Sent.");
-	            System.out.println(applicationManager.getApplicationsForUser(user));
 	        } else {
 	            List<Project> projectList = projectManager.getProjectList(user);
 	            int listSize = projectList.size();
@@ -331,22 +332,31 @@ public class BTOManagementSystem {
 				}
 				System.out.println("-".repeat(27));
 				System.out.println((listSize + 1) + ". EXIT");
+				
 				choice = sc.nextInt();
+				
 				if (1 <= choice && choice <= listSize) {
 					Project selected = projectList.get(choice - 1);
-					List<FlatType> flatTypeList = new ArrayList<>(selected.getFlatTypes());
+					EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply = selected.getFlatSupply();
 
-					System.out.println("\nAvailable Flat Types:");
-					IntStream.range(0, flatTypeList.size())
-							.forEach(i -> System.out.println((i + 1) + ". " + flatTypeList.get(i)));
+				   // Filter flat types based on marital status and age
+				    List<FlatType> viewableFlatTypes = flatSupply.keySet().stream()
+				        .filter(ft -> user.getMaritalStatus().canView(Set.of(ft), user.getAge()))
+				        .toList();
+
+				    // Display the eligible flat types
+				    for (int i = 0; i < viewableFlatTypes.size(); i++) {
+				        FlatType type = viewableFlatTypes.get(i);
+				        SimpleEntry<Integer, Double> info = flatSupply.get(type);
+				        System.out.printf("%d. %s - Supply: %d, Cost: $%.2f%n", i + 1, type, info.getKey(), info.getValue());
+				    }
 
 				    System.out.print("Select a flat type: ");
 				    int flatChoice = sc.nextInt();
-				    if (flatChoice >= 1 && flatChoice <= flatTypeList.size()) {
-				        if (selected.getFlatSupply().containsKey(flatTypeList.get(flatChoice - 1))) {
-
-				            if (selected.getFlatSupply().get(flatTypeList.get(flatChoice - 1)).getKey() > 0) {
-				                applicationManager.createApplication(user, selected, flatTypeList.get(flatChoice - 1));
+				    if (flatChoice >= 1 && flatChoice <= viewableFlatTypes.size()) {
+				        if (selected.getFlatSupply().containsKey(viewableFlatTypes.get(flatChoice - 1))) {
+				        	if (selected.getFlatSupply().get(viewableFlatTypes.get(flatChoice - 1)).getKey() > 0) {
+				                applicationManager.createApplication(user, selected, viewableFlatTypes.get(flatChoice - 1));
 				                applicationManager.saveApplicationtoCSV();
 				                System.out.println("Application sent. Please wait for approval.");
 				            } else {
