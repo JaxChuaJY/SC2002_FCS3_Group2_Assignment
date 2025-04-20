@@ -7,20 +7,14 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 import application.Application;
-import application.ApplicationFileHandler;
 import application.ApplicationManager;
-import application.ApplicationService;
-import application.ReceiptManager;
 import enquiry.Enquiry;
 import enquiry.EnquiryManager;
 import enums.ApplicationStatus;
 import enums.FlatType;
-import interfaces.IApplicationFileHandler;
 import interfaces.IApplicationManager;
-import interfaces.IApplicationService;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
-import interfaces.IReceiptManager;
 import interfaces.IUserManager;
 import project.Project;
 import project.ProjectManager;
@@ -45,12 +39,7 @@ public class BTOManagementSystem {
 		userManager = new UserManager(fileHandler);
 		projectManager = new ProjectManager(fileHandler, userManager);
 		projectRegManager = new ProjectRegistration(userManager, projectManager);
-		
-		IApplicationService applicationService = new ApplicationService(projectManager, userManager);
-		IApplicationFileHandler applicationFileHandler = new ApplicationFileHandler(fileHandler, projectManager, userManager, applicationService);
-		IReceiptManager receiptManager = new ReceiptManager(fileHandler);
-		
-		applicationManager = new ApplicationManager(applicationService, applicationFileHandler, receiptManager);
+		applicationManager = new ApplicationManager(projectManager, userManager, fileHandler);
 		enquiryManager = new EnquiryManager();
 	}
 
