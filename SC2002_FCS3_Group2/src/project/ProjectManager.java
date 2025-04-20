@@ -36,67 +36,11 @@ public class ProjectManager implements IProjectManager {
 
 	public ProjectManager(IFileHandler fileHandler, IUserManager userManager) {
 		// list = readProject(ur); // old
-		projectList = alt_readProject(fileHandler, userManager);
-	}
-
-	//--------FILE READ/WRITE
-	//Old one, delete when done, rename the new one also
-	public static List<Project> readProject(IUserManager ur) {
-		List<Project> list = new ArrayList<Project>();
-		try (Scanner scanner = new Scanner(new File(directory + projectFileName))) {
-			scanner.useDelimiter(",");
-
-			if (scanner.hasNextLine()) {
-				scanner.nextLine(); // Read and discard the first row
-			}
-
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				String[] data = line.split(",");
-
-				if (data.length < 5) {
-					throw new Exception("Data dirty -- Missing data");
-				}
-
-				Project p = new Project();
-				p.setProjectName(data[0]);
-				p.setNeighbourhood(data[1]);
-				// Selling price for flatType MISSING
-
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/M/yyyy");
-				p.setOpeningDate(LocalDate.parse(data[8], formatter));
-				p.setClosingDate(LocalDate.parse(data[9], formatter));
-
-				HDBManager m = (HDBManager) ur.searchUser_Type(HDBManager.class, data[10].replace("\"", ""));
-				p.setManager(m);// 10
-				m.addProject(p);
-
-				p.setOfficerSlots(Integer.parseInt(data[11]));
-
-				for (int i = 12; i < data.length; i++) {
-					HDBOfficer o = (HDBOfficer) ur.searchUser_Type(HDBOfficer.class, data[i].replace("\"", ""));
-					p.addOfficer(o);
-					o.addProject(p);
-				}
-				list.add(p);
-			}
-			// scanner.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Unable to find file!");
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			System.out.println("Error in reading File! -- AGE conversion");
-			e.printStackTrace();
-		} catch (Exception e) {
-			System.out.println("General Error!");
-			e.printStackTrace();
-		}
-
-		return list;
+		projectList = readProject(fileHandler, userManager);
 	}
 
 	//new one
-	public static List<Project> alt_readProject(IFileHandler fileHandler, IUserManager userManager) {
+	public static List<Project> readProject(IFileHandler fileHandler, IUserManager userManager) {
 
 		List<String> allLines = fileHandler.readFromFile(directory + projectFileName);
 		List<String> noHeaderLines = allLines.subList(1, allLines.size());
@@ -400,4 +344,6 @@ public class ProjectManager implements IProjectManager {
  	    }
 		return reserved;
  	}
+
+	
 }

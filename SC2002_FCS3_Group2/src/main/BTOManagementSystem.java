@@ -7,20 +7,14 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 import application.Application;
-import application.ApplicationFileHandler;
 import application.ApplicationManager;
-import application.ApplicationService;
-import application.ReceiptManager;
 import enquiry.Enquiry;
 import enquiry.EnquiryManager;
 import enums.ApplicationStatus;
 import enums.FlatType;
-import interfaces.IApplicationFileHandler;
 import interfaces.IApplicationManager;
-import interfaces.IApplicationService;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
-import interfaces.IReceiptManager;
 import interfaces.IUserManager;
 import project.Project;
 import project.ProjectManager;
@@ -34,7 +28,7 @@ import user.UserManager;
 public class BTOManagementSystem {
 	private IUserManager userManager;
     private IProjectManager projectManager;
-    private ProjectRegistration projectRegManager; //interface this !
+    private ProjectRegistration projectRegManager; 
     private IApplicationManager applicationManager;
 	private IFileHandler fileHandler;
 	private EnquiryManager enquiryManager;
@@ -46,11 +40,7 @@ public class BTOManagementSystem {
 		projectManager = new ProjectManager(fileHandler, userManager);
 		projectRegManager = new ProjectRegistration(userManager, projectManager);
 		
-		IApplicationService applicationService = new ApplicationService(projectManager, userManager);
-		IApplicationFileHandler applicationFileHandler = new ApplicationFileHandler(fileHandler, projectManager, userManager, applicationService);
-		IReceiptManager receiptManager = new ReceiptManager(fileHandler);
-		
-		applicationManager = new ApplicationManager(applicationService, applicationFileHandler, receiptManager);
+		applicationManager = new ApplicationManager(projectManager, userManager, fileHandler);
 		enquiryManager = new EnquiryManager();
 	}
 
@@ -102,7 +92,7 @@ public class BTOManagementSystem {
 		if (userManager.getcurrentUser() instanceof Applicant || userManager.getcurrentUser() instanceof HDBOfficer) {
 			while (true) {
 				System.out.println("\n=== Applicant/Officer Projects ===\n");
-				ProjectManager.viewAllProj(userManager.getcurrentUser());
+				projectManager.viewAllProj(userManager.getcurrentUser());
 				System.out.print("\n");
 				System.out.print("Enter project you would like to view details (enter -1 to exit):");
 				String choice = sc.nextLine();
@@ -110,15 +100,15 @@ public class BTOManagementSystem {
 				if (choice.equalsIgnoreCase("-1")) {
 					break;
 				}
-				else if (ProjectManager.getProject(choice) != null) {
-					Project proj = ProjectManager.getProject(choice);
+				else if (projectManager.getProject(choice) != null) {
+					Project proj = projectManager.getProject(choice);
 					System.out.print(proj.toString());
 					System.out.print("\nDo you want to apply for this project? (Y/N): ");
 					String applyChoice = sc.nextLine();
 					if (applyChoice.equalsIgnoreCase("y")) {
 						System.out.print("\nEnter room type (2-room or 3-room)");
-						FlatType flatChoice = FlatTypeConverter(sc.nextLine());
-						ApplicationManager.createApplication(userManager.getcurrentUser(), ProjectManager.getProject(choice), flatChoice);
+						FlatType flatChoice = FlatType.fromString(sc.nextLine());
+						applicationManager.createApplication(userManager.getcurrentUser(), projectManager.getProject(choice), flatChoice);
 					}
 					else if (applyChoice.equalsIgnoreCase("n")){
 						continue;
@@ -145,17 +135,17 @@ public class BTOManagementSystem {
 			switch (choice) {
 			case 1:
 				System.out.println("\n=== All Projects List ===\n");
-				ProjectManager.viewAllProj(userManager.getcurrentUser());
+				projectManager.viewAllProj(userManager.getcurrentUser());
 				break;
 			case 2:
-				ProjectManager.filterView(filters);	
+				projectManager.filterView(userManager.getcurrentUser().getFilters());	
 				break;
 			case 3:
-				ProjectManager.addProject(userManager.getcurrentUser());
+				projectManager.addProject((HDBManager)userManager.getcurrentUser());
 				break;
 			case 4:
 				System.out.print("Enter Project name: ");
-				ProjectManager.removeProject(sc.nextLine());
+				projectManager.removeProject(sc.nextLine());
 				break;
 			case 5:
 				return;
