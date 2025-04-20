@@ -32,7 +32,9 @@ public class Project {
 		this.closingDate = date2;
 		this.officerSlots = offSlots;
 		this.officerList = new ArrayList<HDBOfficer>();
-		this.isVisible = true;
+		if (openingDate.isBefore(LocalDate.now()) && closingDate.isBefore(LocalDate.now()) || openingDate.isEqual(LocalDate.now()) || closingDate.isEqual(LocalDate.now())) {
+			this.isVisible = true;
+		}
 	}
 	
 	
