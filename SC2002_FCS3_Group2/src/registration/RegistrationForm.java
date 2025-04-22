@@ -11,10 +11,10 @@ public class RegistrationForm {
 	private Project project;
 	private ApplicationStatus status;
 	
-	public RegistrationForm(Project project, HDBOfficer user) {
+	public RegistrationForm(Project project, HDBOfficer hdbOfficer) {
 		// TODO Auto-generated constructor stub
 		this.project = project;
-		registeredBy = user;
+		registeredBy = hdbOfficer;
 		status = ApplicationStatus.PENDING;
 	}
 	

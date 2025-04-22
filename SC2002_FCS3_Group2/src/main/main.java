@@ -1,6 +1,5 @@
 package main;
 
-
 public class main {
 
 	// -----MAIN PROGRAM
@@ -10,7 +9,7 @@ public class main {
 		try {
 			btoSys = new BTOManagementSystem();
 			btoSys.startSystem();
-
+		
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -57,7 +57,7 @@ public class Project {
 	public String toString() {
 		return "Project: " + projectName
 			     + "\n\tNeighbourhood: " + neighbourhood
-			     + "\n\tFlat Supply: " + flatSupply.toString() //Fix flatSupply print.
+			     + "\n\tFlat Supply: " + getFlatTypes_String() 
 			     + "\n\tManaged by: " + manager.getName();
 	}
 
@@ -69,7 +69,6 @@ public class Project {
 	
 	public void addOfficer(HDBOfficer officer) {
 		officerList.add(officer);
-		//officerslots -1 		Only if this means empty slots
 	}
 	
 	//-------PRINTING STATEMENTS
@@ -119,6 +118,14 @@ public class Project {
 	
 	public Set<FlatType> getFlatTypes() {         // For filtering
 	    return flatSupply.keySet();
+	}
+	
+	public String getFlatTypes_String() {
+		String s = "";
+		for (Entry<FlatType, SimpleEntry<Integer, Double>> entry : flatSupply.entrySet()) {
+			s += (entry.getKey()+ ": " +entry.getValue().getKey()+ " units ");
+		}
+		return s;
 	}
 
 	public EnumMap<FlatType, SimpleEntry<Integer, Double>> getFlatSupply() {

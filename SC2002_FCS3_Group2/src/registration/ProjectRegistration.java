@@ -152,7 +152,7 @@ public class ProjectRegistration implements IProjectRegistration{
 				if (data[0].equals(f.getProject().getProjectName())) {
 					lines.add(line.substring(0, line.length()-1) + "," + f.getRegisteredBy().getName() + "\"\n");
 				} else {
-					lines.add(line);
+					lines.add(line + "\n");
 				}
 			}
 			scanner.close();
@@ -198,14 +198,18 @@ public class ProjectRegistration implements IProjectRegistration{
 				System.out.println(r);
 			}
 		}
+		
+		System.out.println("============================END==============================");
 	}
 	
 	public void printList_officer(HDBOfficer u) {
+		System.out.println("=====Registration form of User=====");
 		for (RegistrationForm r: list) {
 			if (r.getRegisteredBy().equals(u)) {
 				System.out.println(r);
 			}
 		}
+		System.out.println("===============END================");
 	}
 	
 	public List<RegistrationForm> getFilteredList(HDBManager u) {
@@ -219,7 +223,7 @@ public class ProjectRegistration implements IProjectRegistration{
 	public List<Project> getNonRegList(List<Project> l, HDBOfficer u){
 		
 		List<Project> userProjects = list.stream()
-		        .filter(r -> r.getRegisteredBy().equals(u))
+		        .filter(r -> r.getRegisteredBy().equals(u) || r.getStatus().equals(ApplicationStatus.PENDING))
 		        .map(RegistrationForm::getProject) 
 		        .collect(Collectors.toList());
 

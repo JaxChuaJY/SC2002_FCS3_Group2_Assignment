@@ -242,7 +242,6 @@ public class BTOManagementSystem {
 				} while (true);
 
 			case 2: // Prints all registration form of user
-				System.out.println("Printing all registration forms");
 				projectRegManager.printList_officer(user);
 				break;
 
@@ -280,7 +279,7 @@ public class BTOManagementSystem {
 						System.out.println(i++ + ". " + r);
 					}
 					System.out.println(i + ". Exit");
-					System.out.println("Select a project by number: ");
+					System.out.println("Select a form by number: ");
 					choice = sc.nextInt();
 
 					if (choice >= 1 && choice <= filteredList.size()) {
@@ -288,7 +287,7 @@ public class BTOManagementSystem {
 
 						do {
 							System.out.println("Approve/Reject: " + selected.getProject().getProjectName() + " for "
-									+ selected.getRegisteredBy());
+									+ selected.getRegisteredBy().getName());
 
 							System.out.println("Yes or No (Y/N)?");
 							String input = sc.next();
@@ -330,7 +329,7 @@ public class BTOManagementSystem {
 
 				} while (true);
 			case 2:
-				projectRegManager.printList_ManagerFilter(user);
+				projectRegManager.printList_ManagerFilter(user);	
 				break;
 			case 3:
 				System.out.println("Exiting Registration Page...");
