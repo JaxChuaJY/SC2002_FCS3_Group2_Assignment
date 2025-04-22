@@ -117,7 +117,39 @@ public class ProjectManager implements IProjectManager {
 
 	}
 
-	//Missing a writeProject?
+	// write Project List into CSV
+	public void writeToCSV(boolean append) {
+		 try (FileWriter writer = new FileWriter(filePath, append)) { 
+			 if (!append) {
+		        	writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer\n");
+			 }
+		        for (Project proj : projectList) {
+		        	EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply = proj.getFlatSupply();
+		        	
+		        	writer.append(proj.getProjectName()).append(",")
+					.append(proj.getNeighbourhood()).append(",");
+		        	
+					for (FlatType type : proj.getFlatTypes()) {
+						SimpleEntry<Integer, Double> entry = flatSupply.get(type);
+						writer.append(type.name()).append(",")
+		                		.append(String.valueOf(entry.getKey())).append(",")
+		                		.append(String.valueOf(entry.getValue())).append(",");
+					}
+					writer.append(proj.getOpeningDate().toString()).append(",")
+					.append(proj.getClosingDate().toString()).append(",")
+					.append(proj.getManagerName()).append(",")
+					.append(Integer.toString(proj.getOfficerSlots())).append(",");
+					List<String> officerNames = proj.getOfficerList().stream().map(HDBOfficer::getName).toList();
+					writer.append("\"").append(String.join(",", officerNames)).append("\"")
+	                		.append("\n");
+			 
+		        }
+		        System.out.print("\nProjects CSV File Updated");
+		 }	catch (IOException e) {
+		        System.err.println("Writing to CSV Error\n");
+		    }
+	}
+	
 	
 	//--------FOR REGISTRATION
 	public List<Project> getFilteredList_Register(User user) {
@@ -207,7 +239,7 @@ public class ProjectManager implements IProjectManager {
 		}while (offSlots > 10);
 		Project newProj = new Project(name, neighbourhood, flatMap, openDate, closeDate, offSlots);
 		newProj.addManager(manager);
-
+		writetoCSV(true);
 	}
 	
 	public void viewProject(User user) {
@@ -257,12 +289,105 @@ public class ProjectManager implements IProjectManager {
 			Project proj = iter.next();
 			if (proj.getProjectName().equalsIgnoreCase(projectName)) {
 				iter.remove();
+				writetoCSV(false);
 				return true;
 			}
 		}
 		return false;
 	}
 
+	public void editProject(Project proj) {
+		Scanner sc = new Scanner(System.in);
+		int choice;
+		System.out.print("\n=== Select Item to edit ===\n");
+		System.out.print("1. Name of Project\n");
+		System.out.print("2. Neighbourhood Project is located\n");
+		System.out.print("3. Change number of 2-Room units\n");
+		System.out.print("4. Change pricing of 2-Room units\n");
+		System.out.print("5. Change number of 3-Room units\n");
+		System.out.print("6. Change pricing of 3-Room units\n");
+		System.out.print("7. Change Project application Opening Date\n");
+		System.out.print("8. Change Project application Closing Date\n");
+		System.out.print("9. Update officer slots for this Project\n");
+		choice = sc.nextInt();
+		
+		switch (choice){
+		case 1:
+			System.out.print("Enter new Project Name: ");
+			proj.setProjectName(sc.nextLine());
+			System.out.print("\nName Updated");
+			break;
+		case 2:
+			System.out.print("Enter new Neighbourhood for Project: ");
+			proj.setNeighbourhood(sc.nextLine());
+			System.out.print("\nNeighbourhood Updated");
+			break;
+		case 3:
+			System.out.print("Enter new number of 2-Room units: ");
+			int newCnt = sc.nextInt();
+			EnumMap<FlatType, SimpleEntry<Integer, Double>> flatSupply = proj.getFlatSupply();
+			SimpleEntry<Integer, Double> oldEntry = flatSupply.get(FlatType.TWO_ROOM);
+			flatSupply.put(FlatType.TWO_ROOM, new SimpleEntry<>(newCnt, oldEntry.getValue()));
+	        proj.setFlatSupply(flatSupply);
+	        System.out.print("\n2-Room Unit Count Updated");
+	        break;
+		case 4:
+			System.out.print("Enter new Price for 2-Room units (with decimal point): ");
+			double newPrice = sc.nextDouble();
+			flatSupply = proj.getFlatSupply();
+			oldEntry = flatSupply.get(FlatType.TWO_ROOM);
+			flatSupply.put(FlatType.TWO_ROOM, new SimpleEntry<>(oldEntry.getKey(), newPrice));
+	        proj.setFlatSupply(flatSupply);
+	        System.out.print("\n2-Room Price Updated");
+	        break;
+		case 5:
+			System.out.print("Enter new number of 3-Room units: ");
+			newCnt = sc.nextInt();
+			flatSupply = proj.getFlatSupply();
+			oldEntry = flatSupply.get(FlatType.THREE_ROOM);
+			flatSupply.put(FlatType.THREE_ROOM, new SimpleEntry<>(newCnt, oldEntry.getValue()));
+	        proj.setFlatSupply(flatSupply);
+	        System.out.print("\n3-Room Unit Count Updated");
+	        break;
+		case 6:
+			System.out.print("Enter new Price for 3-Room units (with decimal point): ");
+			newPrice = sc.nextDouble();
+			flatSupply = proj.getFlatSupply();
+			oldEntry = flatSupply.get(FlatType.THREE_ROOM);
+			flatSupply.put(FlatType.THREE_ROOM, new SimpleEntry<>(oldEntry.getKey(), newPrice));
+	        proj.setFlatSupply(flatSupply);
+	        System.out.print("\n3-Room Price Updated");
+	        break;
+		case 7:
+			System.out.print("Enter new Opening Date (yyyy-MM-dd): ");
+			String openDateStr = sc.nextLine();
+	        LocalDate openDate = LocalDate.parse(openDateStr);
+	        proj.setOpeningDate(openDate);
+	        System.out.print("\nOpening Date Updated");
+	        break;
+		case 8:
+			System.out.print("Enter new Closing Date (yyyy-MM-dd): ");
+			String closeDateStr = sc.nextLine();
+	        LocalDate closeDate = LocalDate.parse(closeDateStr);
+	        proj.setClosingDate(closeDate);
+	        System.out.print("\nClosing Date Updated");
+	        break;
+		case 9:
+	        System.out.print("Enter number of officer slots to update: ");
+	        int officerSlots = sc.nextInt();
+	        proj.setOfficerSlots(officerSlots);
+	        System.out.print("\nOfficer Slots Updated");
+	        break;
+	    default:
+	        System.out.print("\nInvalid Choice");
+	        break;
+		}
+		writetoCSV(false);
+	}
+	public void toggleVisibility(Project proj) {
+		proj.toggleVisibility();
+	}
+	
 	//Only used by the Manager 
 	public void filterView(FilterSettings filters, HDBManager user) {
 	    System.out.println("\n=== Filtered Projects ===");
