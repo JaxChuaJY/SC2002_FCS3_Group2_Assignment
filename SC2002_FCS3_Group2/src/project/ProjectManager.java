@@ -432,7 +432,9 @@ public class ProjectManager implements IProjectManager {
 
 	@Override
 	public List<Project> getProjectList(User user) {
-	    if (user instanceof HDBOfficer) {
+		if (user instanceof HDBManager) {
+			return this.projectList;
+		}else if (user instanceof HDBOfficer) {
 	    	HDBOfficer officer = (HDBOfficer) user;
 	        return this.projectList.stream()
 	                .filter(project -> 
