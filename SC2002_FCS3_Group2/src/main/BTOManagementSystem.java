@@ -187,9 +187,9 @@ public class BTOManagementSystem {
 				break;
 			case 5:
 				System.out.print("Enter Project you would like to edit: ");
-				Project proj = ProjectManager.getProject(sc.nextLine());
+				Project proj = projectManager.getProject(sc.nextLine());
 				if (proj != null){
-					ProjectManager.editProject(proj);
+					projectManager.editProject(proj);
 					break;
 				}
 				else{
@@ -198,9 +198,9 @@ public class BTOManagementSystem {
 				}
 			case 6:
 				System.out.print("Enter Project you would like to Toggle Visibility: ");
-				proj = ProjectManager.getProject(sc.nextLine());
+				proj = projectManager.getProject(sc.nextLine());
 				if (proj != null){
-					ProjectManager.toggleVisibility(proj);
+					projectManager.toggleVisibility(proj);
 					break;
 				}
 				else{
@@ -840,23 +840,24 @@ public class BTOManagementSystem {
 	public void showEnquiryManager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 
-		System.out.println("**--Officer Page");
+		System.out.println("**--Manager Page");
 		System.out.println("Pick a project to view");
-
+		
+		List<Project> pList = projectManager.getProjectList(user);
 		while (true) {
-			for (int i = 0; i < user.getManagedProject().size(); i++) {
-				System.out.println((i + 1) + ". " + user.getManagedProject().get(i).getProjectName());
+			for (int i = 0; i < pList.size(); i++) {
+				System.out.println((i + 1) + ". " + pList.get(i).getProjectName());
 			}
-			System.out.println((user.getManagedProject().size() + 1) + ". EXIT");
+			System.out.println((pList.size() + 1) + ". EXIT");
 			int choice = sc.nextInt(); // try-catch
 
 			while (true) {
-				if (choice == (user.getManagedProject().size() + 1)) {
+				if (choice == (pList.size() + 1)) {
 					System.out.println("Exiting...");
 					return;
-				} else if (1 <= choice && choice <= user.getManagedProject().size()) {
+				} else if (1 <= choice && choice <= pList.size()) {
 
-					Project selected = user.getManagedProject().get(choice);
+					Project selected = pList.get(choice);
 					List<Enquiry> list = enquiryManager.getEnquiryNOReply(selected);
 
 					if (list.isEmpty()) {

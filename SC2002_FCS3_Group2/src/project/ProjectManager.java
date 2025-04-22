@@ -119,7 +119,7 @@ public class ProjectManager implements IProjectManager {
 
 	// write Project List into CSV
 	public void writeToCSV(boolean append) {
-		 try (FileWriter writer = new FileWriter(filePath, append)) { 
+		 try (FileWriter writer = new FileWriter(directory+projectFileName, append)) { 
 			 if (!append) {
 		        	writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer\n");
 			 }
@@ -137,7 +137,7 @@ public class ProjectManager implements IProjectManager {
 					}
 					writer.append(proj.getOpeningDate().toString()).append(",")
 					.append(proj.getClosingDate().toString()).append(",")
-					.append(proj.getManagerName()).append(",")
+					.append(proj.getManager().getName().toString()).append(",")
 					.append(Integer.toString(proj.getOfficerSlots())).append(",");
 					List<String> officerNames = proj.getOfficerList().stream().map(HDBOfficer::getName).toList();
 					writer.append("\"").append(String.join(",", officerNames)).append("\"")
@@ -239,7 +239,7 @@ public class ProjectManager implements IProjectManager {
 		}while (offSlots > 10);
 		Project newProj = new Project(name, neighbourhood, flatMap, openDate, closeDate, offSlots);
 		newProj.addManager(manager);
-		writetoCSV(true);
+		writeToCSV(true);
 	}
 	
 	public void viewProject(User user) {
@@ -289,7 +289,7 @@ public class ProjectManager implements IProjectManager {
 			Project proj = iter.next();
 			if (proj.getProjectName().equalsIgnoreCase(projectName)) {
 				iter.remove();
-				writetoCSV(false);
+				writeToCSV(false);
 				return true;
 			}
 		}
@@ -382,7 +382,7 @@ public class ProjectManager implements IProjectManager {
 	        System.out.print("\nInvalid Choice");
 	        break;
 		}
-		writetoCSV(false);
+		writeToCSV(false);
 	}
 	public void toggleVisibility(Project proj) {
 		proj.toggleVisibility();
