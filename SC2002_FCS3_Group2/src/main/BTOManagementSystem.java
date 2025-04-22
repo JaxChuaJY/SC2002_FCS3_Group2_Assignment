@@ -135,7 +135,9 @@ public class BTOManagementSystem {
 				System.out.print("2. View Filtered list of Projects\n"); 
 				System.out.print("3. Create new Project\n");
 				System.out.print("4. Delete a Project\n");
-				System.out.print("5. Exit\n");
+				System.out.print("5. Edit Project Details\n");
+				System.out.print("6. Toggle Visibility for a Project\n");
+				System.out.print("7. Exit\n");
 				int choice = sc.nextInt();
 				switch (choice) {
 				case 1:
@@ -184,6 +186,28 @@ public class BTOManagementSystem {
 				projectManager.removeProject(sc.nextLine());
 				break;
 			case 5:
+				System.out.print("Enter Project you would like to edit: ");
+				Project proj = ProjectManager.getProject(sc.nextLine());
+				if (proj != null){
+					ProjectManager.editProject(proj);
+					break;
+				}
+				else{
+					System.out.print("\nProject not found");
+					break;
+				}
+			case 6:
+				System.out.print("Enter Project you would like to Toggle Visibility: ");
+				proj = ProjectManager.getProject(sc.nextLine());
+				if (proj != null){
+					ProjectManager.toggleVisibility(proj);
+					break;
+				}
+				else{
+					System.out.print("\nProject not found");
+					break;
+				}
+			case 7:
 				return;
 			default:
 				System.out.println("Invalid input");
