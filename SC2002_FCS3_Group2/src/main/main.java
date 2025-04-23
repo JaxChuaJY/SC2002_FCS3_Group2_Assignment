@@ -1,8 +1,17 @@
 package main;
 
+/**
+ * Entry point for the BTO Management application.
+ */
 public class main {
 
 	// -----MAIN PROGRAM
+	/**
+     * Launches the BTO system, handling exceptions and
+     * iterating user menus until logout.
+     *
+     * @param args command-line arguments (ignored)
+     */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		BTOManagementSystem btoSys;

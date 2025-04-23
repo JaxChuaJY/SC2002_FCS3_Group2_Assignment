@@ -2,7 +2,32 @@ package enquiry;
 
 import java.util.Scanner;
 
+/**
+ * Console-based test application for the {@link EnquiryManager}.
+ * <p>
+ * Presents a menu-driven interface allowing users to:
+ * <ul>
+ *   <li>Add new enquiries</li>
+ *   <li>View all enquiries</li>
+ *   <li>Edit an existing enquiry</li>
+ *   <li>Reply to an enquiry</li>
+ *   <li>Search enquiries by project</li>
+ *   <li>Delete enquiries</li>
+ * </ul>
+ * Reads user input via {@link Scanner} and delegates operations to EnquiryManager.
+ * </p>
+ */
 public class EnquiryTestingMain {
+
+    /**
+     * Entry point of the enquiry testing application.
+     * <p>
+     * Continuously displays menu options until the user chooses to exit.
+     * Delegates each action to the corresponding method on {@link EnquiryManager}.
+     * </p>
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         EnquiryManager manager = new EnquiryManager();
         Scanner scanner = new Scanner(System.in);

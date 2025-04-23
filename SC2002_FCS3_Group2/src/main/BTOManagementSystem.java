@@ -32,15 +32,41 @@ import user.HDBOfficer;
 import user.User;
 import user.UserManager;
 
+/**
+ * Command-line interface for the Build-To-Order (BTO) Management System.
+ * <p>
+ * Handles user authentication and presents menus for different roles:
+ * Applicants, HDB Officers, and HDB Managers. Delegates operations
+ * (applications, projects, registrations, enquiries, and reports)
+ * to the appropriate manager components.
+ * </p>
+ */
 public class BTOManagementSystem {
-	private IUserManager userManager;
-	private IProjectManager projectManager;
-	private ProjectRegistration projectRegManager;
-	private IApplicationManager applicationManager;
-	private IFileHandler fileHandler;
-	private EnquiryManager enquiryManager;
+	
+	/** Manages user login, logout, and session operations. */
+    private IUserManager userManager;
 
-	BTOManagementSystem() {
+    /** Manages project viewing and editing operations. */
+    private IProjectManager projectManager;
+
+    /** Manages HDB Officer registrations for projects. */
+    private ProjectRegistration projectRegManager;
+
+    /** Manages BTO application lifecycle and persistence. */
+    private IApplicationManager applicationManager;
+
+    /** Handles CSV file I/O for users, projects, and applications. */
+    private IFileHandler fileHandler;
+
+    /** Manages creation and response to project enquiries. */
+    private EnquiryManager enquiryManager;
+
+	/**
+     * Constructs the BTOManagementSystem, initializing all managers and file handlers.
+     *
+     * @throws Exception if initialization fails (e.g., file loading errors)
+     */
+    public BTOManagementSystem() throws Exception {
 		fileHandler = new FileHandler();
 		userManager = new UserManager(fileHandler);
 		projectManager = new ProjectManager(fileHandler, userManager);
@@ -49,6 +75,10 @@ public class BTOManagementSystem {
 		enquiryManager = new EnquiryManager();
 	}
 
+	/**
+     * Starts the BTO system: prints users, performs login, and displays
+     * the initial menu if login succeeds.
+     */
 	public void startSystem() {
 		userManager.printAllUser();
 		login();
@@ -59,16 +89,25 @@ public class BTOManagementSystem {
 		}
 	}
 
+	/**
+     * Repeatedly prompts for login until a valid user session is established.
+     */
 	public void login() {
 		do {
 			userManager.login();
 		} while (userManager.getcurrentUser() == null);
 	}
 
+	/**
+     * Logs out the current user and clears the session.
+     */
 	public void logout() {
 		userManager.logout();
 	}
 
+	/**
+     * Changes the current user's password, then logs out and reinitializes the user manager.
+     */
 	public void changePassword() {
 		userManager.changePassword();
 		logout();
@@ -81,6 +120,9 @@ public class BTOManagementSystem {
 
 	}
 
+	/**
+     * Displays the main menu for the logged-in user.
+     */
 	public void showMenu() {
 		userManager.getcurrentUser().showMenu(this);
 	}
@@ -90,6 +132,9 @@ public class BTOManagementSystem {
 	 * Feel free to do it as you like
 	 */
 
+	/**
+     * Displays project-related options based on user role (Applicant/Officer/Manager).
+     */
 	public void showProjMenu() {
 		
 		Scanner sc = new Scanner(System.in);
@@ -218,6 +263,9 @@ public class BTOManagementSystem {
 	}
 
 	// -----Register Section
+	/**
+     * Displays registration menu for HDB Officers or Managers.
+     */
 	public void showRegMenu() {
 		if (userManager.getcurrentUser() instanceof HDBOfficer) {
 			regSection_Officer((HDBOfficer) userManager.getcurrentUser());
@@ -226,6 +274,11 @@ public class BTOManagementSystem {
 		}
 	}
 
+	/**
+     * Shows the registration options to an HDB Officer.
+     *
+     * @param user the HDBOfficer reviewing officer registrations
+     */
 	public void regSection_Officer(HDBOfficer user) {
 
 		Scanner sc = new Scanner(System.in);
@@ -281,6 +334,11 @@ public class BTOManagementSystem {
 
 	}
 
+	/**
+     * Shows the registration options to an HDB Manager.
+     *
+     * @param user the HDBManager reviewing officer registrations
+     */
 	public void regSection_Manager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 		int choice = -1;
@@ -367,6 +425,9 @@ public class BTOManagementSystem {
 	}
 
 	// -----Application section
+	/**
+     * Displays application menu for various roles, including withdrawal and booking.
+     */
 	public void showApplMenu() {
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showMenuManager((HDBManager) userManager.getcurrentUser());
@@ -389,7 +450,13 @@ public class BTOManagementSystem {
 		}
 
 	}
-
+ 	
+	/**
+     * Displays menu options specifically for Applicants, allowing them to
+     * view, apply, or withdraw BTO applications.
+     *
+     * @param user the Applicant whose menu is displayed
+     */
 	public void showMenuApplicant(Applicant user) {
 		// Prints only 1 application? idk
 		Scanner sc = new Scanner(System.in);
@@ -489,6 +556,12 @@ public class BTOManagementSystem {
 		}
 	}
 	
+	/**
+     * Displays menu options specifically for HDB Officers, allowing them to
+     * process and book applications for projects they manage.
+     *
+     * @param user the HDBOfficer whose menu is displayed
+     */
 	public void showMenuOfficer(HDBOfficer user) {
 
 		int choice = -1;
@@ -563,6 +636,12 @@ public class BTOManagementSystem {
 		} while (true);
 	}
 
+    /**
+     * Displays menu options specifically for HDB Managers, allowing them to
+     * approve/reject applications and view project reporting.
+     *
+     * @param user the HDBManager whose menu is displayed
+     */
 	public void showMenuManager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 		int choice = -1;
@@ -668,6 +747,9 @@ public class BTOManagementSystem {
 	}
 
 	// -----Enquiry Section
+	/**
+     * Displays enquiry-related menus for sending or replying to enquiries.
+     */
 	public void showEnquiryMenu() {
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showEnquiryManager((HDBManager) userManager.getcurrentUser());
@@ -688,6 +770,12 @@ public class BTOManagementSystem {
 		}
 	}
 
+	/**
+     * Shows the enquiry menu for an Applicant, allowing them to view, create,
+     * edit their submitted enquiries.
+     *
+     * @param user the Applicant whose enquiries are managed
+     */
 	public void showEnquiryApplicant(Applicant user) {
 
 		Scanner sc = new Scanner(System.in);
@@ -774,6 +862,11 @@ public class BTOManagementSystem {
 		}
 	}
 
+	/**
+     * Shows the enquiry menu for an HDB Officer, allowing them to view and reply to enquiries.
+     *
+     * @param user the HDBOfficer whose enquiries are managed
+     */
 	public void showEnquiryOfficer(HDBOfficer user) {
 
 		Scanner sc = new Scanner(System.in);
@@ -836,7 +929,12 @@ public class BTOManagementSystem {
 
 	}
 
-	// Copy pasted from Officer.
+
+    /**
+     * Shows the enquiry menu for an HDB Manager, allowing them to view and reply to all project enquiries.
+     *
+     * @param user the HDBManager whose enquiries are managed
+     */
 	public void showEnquiryManager(HDBManager user) {
 		Scanner sc = new Scanner(System.in);
 
@@ -899,6 +997,10 @@ public class BTOManagementSystem {
 	}
 
 	//-----Report
+	/**
+     * Displays the report filter menu, prompts for filter criteria,
+     * and outputs a filtered list of BTO application reports.
+     */
 	public void showReportMenu() {
  		System.out.println("=====Application Report Filter=====");
  		
@@ -943,7 +1045,12 @@ public class BTOManagementSystem {
  	}
 	
 	//-----Filter Settings
-	public void showFilterMenu(User user) {
+	    /**
+		 * Displays filter settings menu for users to adjust project filters.
+		 *
+		 * @param user the current User whose filters are modified
+		 */
+		public void showFilterMenu(User user) {
 		boolean manager = user instanceof HDBManager ? true : false;
 		Scanner sc = new Scanner(System.in);
 		while (true) {
