@@ -14,7 +14,12 @@ public class FilterSettings {
     }
 
     public void setLocation(String location) {
-        this.location = location;
+    	if (location.equals("None")) {
+    		this.location = null;
+    	}else {
+    		this.location = location;
+    	}
+        
     }
 
     public void setFlatType(FlatType flatType) {

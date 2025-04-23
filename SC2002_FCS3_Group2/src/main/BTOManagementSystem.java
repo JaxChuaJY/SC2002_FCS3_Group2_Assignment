@@ -961,7 +961,7 @@ public class BTOManagementSystem {
 
 			switch (choice) {
 			case 1:
-				System.out.println("Please input location");
+				System.out.println("Please input location:(Input 'None' if none)");
 				userManager.getcurrentUser().getFilters().setLocation(sc.next());
 				System.out.println("Location set!");
 				break;
