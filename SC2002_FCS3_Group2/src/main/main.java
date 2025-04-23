@@ -7,7 +7,7 @@ public class main {
 		// TODO Auto-generated method stub
 		BTOManagementSystem btoSys;
 		try {
-			btoSys = new BTOManagementSystem();
+			btoSys = setUpFactory.createSystem();
 			btoSys.startSystem();
 		
 

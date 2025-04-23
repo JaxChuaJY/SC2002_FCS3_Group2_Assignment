@@ -21,6 +21,7 @@ import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
+import interfaces.IProjectRegistration;
 import interfaces.IUserManager;
 import project.Project;
 import project.ProjectManager;
@@ -35,7 +36,7 @@ import user.UserManager;
 public class BTOManagementSystem {
 	private IUserManager userManager;
 	private IProjectManager projectManager;
-	private ProjectRegistration projectRegManager;
+	private IProjectRegistration projectRegManager;
 	private IApplicationManager applicationManager;
 	private IFileHandler fileHandler;
 	private EnquiryManager enquiryManager;
@@ -47,6 +48,17 @@ public class BTOManagementSystem {
 		projectRegManager = new ProjectRegistration(userManager, projectManager);
 		applicationManager = new ApplicationManager(projectManager, userManager, fileHandler);
 		enquiryManager = new EnquiryManager();
+	}
+
+	public BTOManagementSystem(IFileHandler fileHandler, IUserManager userManager, IProjectManager projectManager,
+			IProjectRegistration projectRegManager, IApplicationManager applicationManager,
+			EnquiryManager enquiryManager) {
+		this.fileHandler = fileHandler;
+		this.userManager = userManager;
+		this.projectManager = projectManager;
+		this.projectRegManager = projectRegManager;
+		this.applicationManager = applicationManager;
+		this.enquiryManager = enquiryManager;
 	}
 
 	public void startSystem() {
@@ -1011,7 +1023,7 @@ public class BTOManagementSystem {
 	/**
 	 * @return the projectRegManager
 	 */
-	public ProjectRegistration getProjectRegManager() {
+	public IProjectRegistration getProjectRegManager() {
 		return projectRegManager;
 	}
 
