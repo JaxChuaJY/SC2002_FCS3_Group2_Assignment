@@ -71,7 +71,7 @@ public class BTOManagementSystem {
 	}
 
 	public void startSystem() {
-		userManager.printAllUser();
+		//userManager.printAllUser(); -- easy user reference
 		login();
 		if (userManager.getcurrentUser() != null) {
 			System.out.println(userManager.getcurrentUser());
