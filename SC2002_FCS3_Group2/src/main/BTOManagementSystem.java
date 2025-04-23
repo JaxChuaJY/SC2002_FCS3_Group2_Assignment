@@ -19,6 +19,7 @@ import interfaces.IFileHandler;
 import interfaces.IProjectManager;
 import interfaces.IProjectRegistration;
 import interfaces.IUserManager;
+import interfaces.IEnquiryManager;
 import project.Project;
 import registration.RegistrationForm;
 import user.Applicant;
@@ -52,7 +53,7 @@ public class BTOManagementSystem {
     private IFileHandler fileHandler;
 
     /** Manages creation and response to project enquiries. */
-    private EnquiryManager enquiryManager;
+    private IEnquiryManager enquiryManager;
 
 	/**
 	 * Constructs the BTOManagementSystem, initializing all managers and file handlers.
@@ -61,7 +62,7 @@ public class BTOManagementSystem {
 	 */
 	public BTOManagementSystem(IFileHandler fileHandler, IUserManager userManager, IProjectManager projectManager,
 			IProjectRegistration projectRegManager, IApplicationManager applicationManager,
-			EnquiryManager enquiryManager) throws Exception {
+			IEnquiryManager enquiryManager) throws Exception {
 		this.fileHandler = fileHandler;
 		this.userManager = userManager;
 		this.projectManager = projectManager;
@@ -801,10 +802,10 @@ public class BTOManagementSystem {
 
 				if (choice == (enquiryList.size() + 1)) {
 					System.out.println("Exiting...");
-					return;
-				} else if (choice < enquiryList.size() - 1 && choice > 0) {
+					break;
+				} else if (choice <= enquiryList.size() && choice > 0) {
 					Enquiry selected = enquiryList.get(choice-1);
-					System.out.print(selected);
+					System.out.println(selected);
 					break;
 				} else {
 					System.out.println("Bad input");
@@ -841,7 +842,11 @@ public class BTOManagementSystem {
 					enquiryManager.addEnquiry(user, selected, message);
 					System.out.println("Enquiry made!");
 
-				} else {
+				}else if (choice == (listSize + 1)) {
+					System.out.println("Exiting...");
+					
+				}
+				else {
 					System.out.println("Invalid Project selection");
 				}
 				break;
@@ -850,9 +855,9 @@ public class BTOManagementSystem {
 				return;
 			default:
 				System.out.println("Invalid input, try again.");
+				sc.nextLine();
 				break;
 			}
-
 			System.out.println("**--Applicant Enquiry Page");
 			System.out.println("1. View enquries");
 			System.out.println("2. Create enquiry");
@@ -896,20 +901,20 @@ public class BTOManagementSystem {
 						// Select a enquire to reply
 						System.out.println("=====Select Enquiry to reply to=====");
 						for (int i = 0; i < list.size(); i++) {
-							System.out.println((i + 1) + ". By: " + list.get(i).getSender().getName() + "Message: "
+							System.out.println((i + 1) + ". By: " + list.get(i).getSender().getName() + " Message: "
 									+ list.get(i).getMessage());
 						}
 						System.out.println((list.size() + 1) + ". EXIT");
 						choice = sc.nextInt();
 						sc.nextLine();
-						
+
 						while (true) {
 							if (choice == (list.size() + 1)) {
 								System.out.println("Exiting...");
 								return;
 							} else if (1 <= choice && choice <= list.size()) {
 								System.out.println("Please type reply:");
-								String message = sc.next();
+								String message = sc.nextLine();
 								enquiryManager.replyToEnquiry(list.get(choice-1).getEnquiryId(), message);
 								System.out.println("Reply made!");
 								return;
@@ -956,7 +961,7 @@ public class BTOManagementSystem {
 					return;
 				} else if (1 <= choice && choice <= pList.size()) {
 
-					Project selected = pList.get(choice);
+					Project selected = pList.get(choice-1);
 					List<Enquiry> list = enquiryManager.getEnquiryNOReply(selected);
 
 					if (list.isEmpty()) {
@@ -965,7 +970,7 @@ public class BTOManagementSystem {
 						// Select a enquire to reply
 						System.out.println("=====Select Enquiry to reply to=====");
 						for (int i = 0; i < list.size(); i++) {
-							System.out.println((i + 1) + ". By: " + list.get(i).getSender().getName() + "Message: "
+							System.out.println((i + 1) + ". By: " + list.get(i).getSender().getName() + " Message: "
 									+ list.get(i).getMessage());
 						}
 						System.out.println((list.size() + 1) + ". EXIT");
