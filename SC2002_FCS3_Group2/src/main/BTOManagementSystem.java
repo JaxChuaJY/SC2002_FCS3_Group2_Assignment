@@ -80,7 +80,7 @@ public class BTOManagementSystem {
      * the initial menu if login succeeds.
      */
 	public void startSystem() {
-		
+		//userManager.printAllUser(); -- easy user reference
 		login();
 		if (userManager.getcurrentUser() != null) {
 			System.out.println(userManager.getcurrentUser());
