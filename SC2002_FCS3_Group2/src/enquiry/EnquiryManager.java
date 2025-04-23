@@ -28,11 +28,14 @@ public class EnquiryManager {
 	private List<Enquiry> enquiryList;
     /** Formatter for parsing and formatting dates in dd/MM/yyyy pattern. */
 	private static final DateTimeFormatter a = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    /** Create path for CSV file to be called up and loaded in */
+	private static final String CSV_PATH = new File("data", "enquiries.csv").getPath();
     /**
      * Constructs a new EnquiryManager with an empty enquiry list.
      */
-	public EnquiryManager() {
+	public EnquiryManager(IProjectManager projectManager, IUserManager userManager) {
+		this.projectManager = projectManager;
+	    	this.userManager = userManager;
 		enquiryList = new ArrayList<>();
 	}
 
@@ -60,6 +63,8 @@ public class EnquiryManager {
 			return; // keep the current enquiryList (not replaced)
 		}
 
+		enquiryList.clear();
+
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String line = br.readLine(); // skip header
 			while ((line = br.readLine()) != null) {
@@ -67,9 +72,10 @@ public class EnquiryManager {
 				if (parts.length >= 7) {
 					// String sender = parts[0];
 					// String project = parts[1];
-					User u;
+					//User u;
 					try {
-						u = userManager.searchUser_Type(User.class, parts[0]);
+						//u = userManager.searchUser_Type(User.class, parts[0]);
+						String senderNric = parts[0];
 						Project p = projectManager.getProject(parts[1]);
 						String message = parts[2];
 						String reply = parts[3];
@@ -77,7 +83,13 @@ public class EnquiryManager {
 						LocalDate dateReplied = parts[5].isEmpty() ? null : LocalDate.parse(parts[5], a);
 						boolean replied = Boolean.parseBoolean(parts[6]);
 
-						Enquiry e = new Enquiry(u, p, message);
+						User sender = userManager.getUser(senderNric);
+						if (sender == null) {
+							System.out.println("User not found for NRIC: " + senderNric);
+							continue;
+						}	
+
+						Enquiry e = new Enquiry(sender, p, message);
 						e.setMessage(message);
 						if (replied) {
 							e.setReply(reply);
@@ -143,7 +155,7 @@ public class EnquiryManager {
 
 			for (Enquiry e : enquiryList) {
 				StringBuilder sb = new StringBuilder();
-				sb.append(escapeCSV(e.getSender().getName())).append(",");
+				sb.append(escapeCSV(e.getSender().getNric())).append(",");
 				sb.append(escapeCSV(e.getProject().getProjectName())).append(",");
 				sb.append(escapeCSV(e.getMessage())).append(",");
 				sb.append(escapeCSV(e.getReply())).append(",");
@@ -188,6 +200,7 @@ public class EnquiryManager {
 		Enquiry e = new Enquiry(sender, project, message);
 		enquiryList.add(e);
 		System.out.println("Date Created: " + e.getDateCreated());
+		exportToCSV(CSV_PATH);
 		// System.out.println("Enquiry added with ID: " + e.getEnquiryId());
 	}
 
@@ -300,6 +313,7 @@ public class EnquiryManager {
 					e.setMessage(newMessage);
 					System.out.println("Enquiry updated.");
 					System.out.println("Date Created: " + e.getDateCreated());
+					exportToCSV(CSV_PATH);
 					return;
 				}
 			}
@@ -318,6 +332,7 @@ public class EnquiryManager {
 			if (e.getEnquiryId() == id) {
 				e.setReply(reply);
 				System.out.println("Reply saved.");
+				exportToCSV(CSV_PATH);
 				return;
 			}
 		}
