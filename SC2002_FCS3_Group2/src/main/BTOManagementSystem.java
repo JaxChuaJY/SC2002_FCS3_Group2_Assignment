@@ -113,6 +113,7 @@ public class BTOManagementSystem {
 						System.out.print("\nEnter room type (2-room or 3-room)");
 						FlatType flatChoice = FlatType.fromString(sc.nextLine());
 						applicationManager.createApplication(userManager.getcurrentUser(), projectManager.getProject(choice), flatChoice);
+						applicationManager.saveApplicationtoCSV();
 					}
 					else if (applyChoice.equalsIgnoreCase("n")){
 						continue;
