@@ -2,7 +2,6 @@ package interfaces;
 
 import java.util.List;
 
-import user.Applicant;
 import user.User;
 
 /**

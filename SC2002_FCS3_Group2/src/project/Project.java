@@ -1,8 +1,6 @@
 package project;
 
 import enums.FlatType;
-import enums.MaritalStatus;
-import user.Applicant;
 import user.HDBManager;
 import user.HDBOfficer;
 
