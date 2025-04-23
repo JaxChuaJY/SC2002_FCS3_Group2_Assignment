@@ -32,7 +32,8 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 			System.out.println("3. Application Section");
 			System.out.println("4. Enquiries menu");
 			System.out.println("5. Registration Section");
-			System.out.println("6. EXIT");
+			System.out.println("6. Filter Settings");
+			System.out.println("7. EXIT");
 			try {
 				choice = sc.nextInt();
 
@@ -54,6 +55,9 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 					btoSys.showRegMenu();
 					break;
 				case 6:
+					btoSys.showFilterMenu();
+					break;
+				case 7:
 					btoSys.logout();
 					return;
 				default:

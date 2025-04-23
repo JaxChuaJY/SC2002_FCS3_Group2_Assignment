@@ -33,7 +33,8 @@ public class Applicant extends User {
 			System.out.println("2. Project section");
 			System.out.println("3. Application Section");
 			System.out.println("4. Enquiries menu");
-			System.out.println("5. EXIT");
+			System.out.println("5. Filter settings");
+			System.out.println("6. EXIT");
 			choice = sc.nextInt();
 
 			try {
@@ -52,6 +53,9 @@ public class Applicant extends User {
 					btoSys.showEnquiryMenu();
 					break;
 				case 5:
+					btoSys.showFilterMenu();;
+					break;
+				case 6:
 					btoSys.logout();
 					return;
 				default:
