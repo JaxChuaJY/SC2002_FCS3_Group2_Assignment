@@ -745,7 +745,7 @@ public class BTOManagementSystem {
 		enquiryManager.loadFromCSV("data/enquiries.csv", userManager, projectManager);
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showEnquiryManager((HDBManager) userManager.getcurrentUser());
-		} else if (userManager.getcurrentUser() instanceof HDBOfficer) {
+		} else {
 			Scanner sc = new Scanner(System.in);
 			System.out.println("Continue as");
 			System.out.println("1. HDB Officer");
