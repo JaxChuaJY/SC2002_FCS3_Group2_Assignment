@@ -1,9 +1,18 @@
 package user;
 
-import java.io.IOException;
-
+/**
+ * Utility class for validating user input formats.
+ * <p>
+ * Provides methods to check numeric strings and verify NRIC format.
+ * </p>
+ */
 public class FormatChecker {
-	
+    /**
+     * Checks if a given string represents a valid integer.
+     *
+     * @param str the string to check
+     * @return true if the string can be parsed as an integer, false otherwise
+     */
 	public static boolean isNumeric(String str) {
 	    try {
 	        Integer.parseInt(str);
@@ -13,7 +22,16 @@ public class FormatChecker {
 	    }
 	}
 	
-	
+    /**
+     * Validates the format of an NRIC string.
+     * <p>
+     * A valid NRIC must be exactly 9 characters long,
+     * start and end with a letter, and contain only digits in between.
+     * </p>
+     *
+     * @param nric the NRIC string to validate
+     * @return true if the NRIC matches the expected format, false otherwise
+     */
 	public static boolean nricFormat(String nric)  {
 			
 		if (nric.length() != 9) {

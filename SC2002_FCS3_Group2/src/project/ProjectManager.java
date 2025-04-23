@@ -27,19 +27,42 @@ import user.HDBManager;
 import user.HDBOfficer;
 import user.User;
 
+/**
+ * Manages creation, retrieval, updating, deletion, and filtering of {@link Project} instances.
+ * <p>
+ * Responsible for reading project data from CSV, writing updates back,
+ * and providing project views tailored to different user roles.
+ * </p>
+ */
 public class ProjectManager implements IProjectManager {
 
+	/** In-memory list of all projects. */
 	private List<Project> projectList;
 
+	/** Base directory for project CSV file. */
 	private static String directory = "data/";
+	
+	/** Filename for project data CSV. */
 	private static String projectFileName = "ProjectList.csv";
 
+    /**
+     * Constructs the manager, loading projects via the given file and user handlers.
+     *
+     * @param fileHandler handler for CSV I/O
+     * @param userManager handler for user lookups
+     */
 	public ProjectManager(IFileHandler fileHandler, IUserManager userManager) {
 		// list = readProject(ur); // old
 		projectList = readProject(fileHandler, userManager);
 	}
 
-	//new one
+	/**
+     * Reads projects from the CSV file and initializes projectList.
+     *
+     * @param fileHandler handler for reading CSV
+     * @param userManager handler for retrieving User instances
+     * @return list of Project objects
+     */	
 	public static List<Project> readProject(IFileHandler fileHandler, IUserManager userManager) {
 
 		List<String> allLines = fileHandler.readFromFile(directory + projectFileName);
@@ -118,6 +141,11 @@ public class ProjectManager implements IProjectManager {
 	}
 
 	// write Project List into CSV
+	/**
+     * Writes the current projectList to the CSV file.
+     *
+     * @param append if true, preserves header and appends; false overwrites
+     */
 	public void writeToCSV(boolean append) {
 		 try (FileWriter writer = new FileWriter(directory+projectFileName, append)) { 
 			 if (!append) {
@@ -152,11 +180,24 @@ public class ProjectManager implements IProjectManager {
 	
 	
 	//--------FOR REGISTRATION
+	/**
+     * Filters the project list for officer registration eligibility.
+     *
+     * @param user the HDBOfficer applying
+     * @return list of Projects user can register for
+     */
 	public List<Project> getFilteredList_Register(User user) {
 		// TODO Auto-generated method stub
 		return projectList.stream().filter(p -> projectREGviewCriteria((HDBOfficer) user, p)).collect(Collectors.toList());
 	}
 
+	/**
+     * Criteria for HDBOfficer registration view.
+     *
+     * @param user the officer
+     * @param project the project to check
+     * @return true if eligible to register
+     */
 	public boolean projectREGviewCriteria(HDBOfficer user, Project project) {
 
 		if (user.getManagedProject().contains(project)) {
@@ -180,22 +221,14 @@ public class ProjectManager implements IProjectManager {
 
 		return true;
 	}
-
-	// REMEMBER TO REMOVE!
-	public void printList() {
-
-		System.out.println("============ProjectManager PRINT ALL============");
-
-		for (Project p : projectList) {
-			System.out.println("-----------");
-			System.out.print(p);
-			p.printOfficerList();
-			p.printFlatSupply();
-			System.out.println("----------");
-		}
-	}
 	
 	//--------ProjectManager functions
+	/**
+     * Adds a new project via console input.
+     * Only accessible by HDBManager.
+     *
+     * @param manager the HDBManager creating the project
+     */
 	public void addProject(HDBManager manager) { 
 		//Change User to HDBManager, whoever calls it needs a ClassCastingException try-catch
 		Scanner sc = new Scanner(System.in);
@@ -242,6 +275,14 @@ public class ProjectManager implements IProjectManager {
 		writeToCSV(true);
 	}
 	
+    /**
+     * Prompts the user to enter a project name and displays its details.
+     * <p>
+     * Reads input from console, looks up the project, and prints its information
+     * or an error message if not found.
+     * </p>
+     * @param user the user requesting the project view (used for access control)
+     */
 	public void viewProject(User user) {
 		Project project = null;
 		Scanner sc = new Scanner(System.in);
@@ -255,7 +296,12 @@ public class ProjectManager implements IProjectManager {
 			System.out.print(project.toString());
 		}
 	}
-	
+
+	/**
+     * Displays all projects accessible to the given user.
+     *
+     * @param user the requesting User
+     */	
 	public void viewAllProj(User user) {
 		if (user instanceof HDBManager) {
 			for (Project proj : projectList) {
@@ -283,6 +329,12 @@ public class ProjectManager implements IProjectManager {
 		}
 	}
 	
+	/**
+     * Removes a project by name, updating CSV.
+     *
+     * @param projectName the name to remove
+     * @return true if removed, false otherwise
+     */
 	public boolean removeProject(String projectName) {
 		Iterator<Project> iter = projectList.iterator();
 		while (iter.hasNext()) {
@@ -296,6 +348,11 @@ public class ProjectManager implements IProjectManager {
 		return false;
 	}
 
+	/**
+     * Edits attributes of an existing project via console input.
+     *
+     * @param proj the project to edit
+     */
 	public void editProject(Project proj) {
 		Scanner sc = new Scanner(System.in);
 		int choice;
@@ -384,11 +441,23 @@ public class ProjectManager implements IProjectManager {
 		}
 		writeToCSV(false);
 	}
+
+	/**
+     * Toggles visibility of a project and persists change.
+     *
+     * @param proj the project to toggle
+     */
 	public void toggleVisibility(Project proj) {
 		proj.toggleVisibility();
 	}
 	
 	//Only used by the Manager 
+	/**
+     * Displays filtered projects based on manager's filter settings.
+     *
+     * @param filters the filter criteria
+     * @param user the HDBManager applying filters
+     */
 	public void filterView(FilterSettings filters, HDBManager user) {
 	    System.out.println("\n=== Filtered Projects ===");
 	    for (Project p : projectList) {                 
@@ -416,8 +485,13 @@ public class ProjectManager implements IProjectManager {
 	
 	
 	//--------GETTER AND SETTERS
-	
-	
+	/**
+     * Searches for and returns a single project by name.
+     *
+     * @param projectName the name to search
+     * @return matching Project
+     * @throws IllegalStateException if zero or multiple matches
+     */
 	public Project getProject(String projectName) {
 		// TODO Auto-generated method stub
 		List<Project> list = this.projectList.stream().filter(p -> p.getProjectName().equals(projectName))
@@ -430,6 +504,12 @@ public class ProjectManager implements IProjectManager {
 		}
 	}
 
+	/**
+     * Provides projects viewable by the user for applying.
+     *
+     * @param user the User requesting projects
+     * @return filtered list of Projects
+     */
 	@Override
 	public List<Project> getProjectList(User user) {
 		if (user instanceof HDBManager) {
@@ -453,6 +533,14 @@ public class ProjectManager implements IProjectManager {
 	    }
 	}
 	
+	/**
+     * Updates flat room counts and persists to CSV.
+     *
+     * @param project target project
+     * @param flatType type of flat to adjust
+     * @param x delta units (positive/negative)
+     * @return true if update succeeded
+     */
 	public boolean updateFlatRooms(Project project, FlatType flatType, int x) {		// x is the number to increase / decrease the "X-ROOMS" number (1 / -1)
 		boolean reserved = project.updateFlatSupply(flatType, x);
  		

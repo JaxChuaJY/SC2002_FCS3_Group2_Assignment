@@ -9,15 +9,41 @@ import enums.MaritalStatus;
 import main.BTOManagementSystem;
 import project.Project;
 
+/**
+ * Represents an HDB Manager in the BTO Management System.
+ * <p>
+ * HDB Managers can create and manage BTO projects, process applications,
+ * handle registrations, generate reports, and navigate manager-specific menus.
+ * </p>
+ */
 public class HDBManager extends User {
 	
+    /** List of projects this manager is responsible for. */
 	private List<Project> managedProject = new ArrayList<Project>();
 
+	/**
+     * Constructs a new HDBManager with personal and login details.
+     *
+     * @param name           the manager's name
+     * @param nric           the manager's NRIC identifier
+     * @param age            the manager's age
+     * @param maritalstatus  the manager's marital status (unused for HDBManager)
+     * @param password       the manager's login password
+     */
 	public HDBManager(String name, String nric, int age, MaritalStatus maritalstatus, String password) {
 		super(name, nric, age, maritalstatus, password);
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+     * Displays the Manager menu and handles user selections.
+     * <p>
+     * Options include changing password, project section, application section,
+     * enquiry menu, registration section, report generation, and exit.
+     * </p>
+     *
+     * @param btoSys the BTOManagementSystem instance for delegating actions
+     */
 	@Override
 	public void showMenu(BTOManagementSystem btoSys) {
 		Scanner sc = new Scanner(System.in);
@@ -30,7 +56,7 @@ public class HDBManager extends User {
 			System.out.println("4. Enquiries menu");
 			System.out.println("5. Registration Section");
 			System.out.println("6. Generate report");
-			System.out.println("7. Filter Settings");
+			System.out.println("7. Filter settings");
 			System.out.println("8. EXIT");
 			choice = sc.nextInt();
 
@@ -77,6 +103,11 @@ public class HDBManager extends User {
 
 	}
 
+	/**
+     * Adds a project to this manager's responsibility list.
+     *
+     * @param p the Project to add
+     */
 	public void addProject(Project p) {
 		managedProject.add(p);
 	}

@@ -16,16 +16,37 @@ import interfaces.IUserManager;
 import project.Project;
 import user.User;
 
+/**
+ * Manages user enquiries for BTO projects, including persistence and retrieval.
+ * <p>
+ * Supports loading from CSV, exporting to CSV, adding new enquiries,
+ * querying by sender or project, editing messages, and replying.
+ * </p>
+ */
 public class EnquiryManager {
+	/** List of all loaded enquiries. */
 	private List<Enquiry> enquiryList;
+    /** Formatter for parsing and formatting dates in dd/MM/yyyy pattern. */
 	private static final DateTimeFormatter a = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Constructs a new EnquiryManager with an empty enquiry list.
+     */
 	public EnquiryManager() {
 		enquiryList = new ArrayList<>();
 	}
 
 	// File-related functions
-
+	/**	
+     * Loads enquiries from a CSV file, creating Enquiry instances.
+     * <p>
+     * If the file does not exist, creates a new one with a header.
+     * </p>
+     *
+     * @param filename       path to the CSV file
+     * @param userManager    for resolving sender User objects
+     * @param projectManager for resolving Project objects
+     */
 	public void loadFromCSV(String filename, IUserManager userManager, IProjectManager projectManager) {
 		File file = new File(filename);
 
@@ -77,6 +98,12 @@ public class EnquiryManager {
 		}
 	}
 
+	/**
+     * Parses a single CSV line into its component fields, handling quoted tokens.
+     *
+     * @param line the raw CSV line
+     * @return array of field values
+     */
 	private String[] parseCSVLine(String line) {
 		List<String> tokens = new ArrayList<>();
 		StringBuilder current = new StringBuilder();
@@ -104,6 +131,11 @@ public class EnquiryManager {
 		return tokens.toArray(new String[0]);
 	}
 
+   /**
+     * Exports all enquiries to a CSV file, including headers.
+     *
+     * @param filename path to output CSV file
+     */
 	public void exportToCSV(String filename) {
 		try (FileWriter writer = new FileWriter(filename)) {
 			// Write CSV header
@@ -128,6 +160,12 @@ public class EnquiryManager {
 		}
 	}
 
+	/**
+     * Escapes a field for CSV output, quoting if necessary.
+     *
+     * @param field the raw field value
+     * @return safely escaped CSV field
+     */
 	private String escapeCSV(String field) {
 		if (field == null)
 			return "";
@@ -139,6 +177,13 @@ public class EnquiryManager {
 	}
 
 	// End of file-related functions
+	/**
+     * Adds a new enquiry to the in-memory list.
+     *
+     * @param sender  the User who submits the enquiry
+     * @param project the Project being enquired about
+     * @param message the enquiry message
+     */
 	public void addEnquiry(User sender, Project project, String message) {
 		Enquiry e = new Enquiry(sender, project, message);
 		enquiryList.add(e);
@@ -146,6 +191,9 @@ public class EnquiryManager {
 		// System.out.println("Enquiry added with ID: " + e.getEnquiryId());
 	}
 
+	/**
+     * Prints all enquiries and their replies to console.
+     */
 	public void printAll() {
 		if (enquiryList.isEmpty()) {
 			System.out.println("No enquiries.");
@@ -158,10 +206,22 @@ public class EnquiryManager {
 		}
 	}
 
+	/**
+     * Retrieves enquiries sent by a specific user.
+     *
+     * @param user the sender User
+     * @return list of matching Enquiry objects
+     */
 	public List<Enquiry> getEnquiry_filterSend(User user) {
 		return enquiryList.stream().filter(en -> en.getSender().equals(user.getName())).collect(Collectors.toList());
 	}
 
+	/**
+     * Checks if an enquiry with given ID is deletable (not replied).
+     *
+     * @param id the enquiry ID to check
+     * @return true if found and not replied, false otherwise
+     */
 	public boolean deleteCheck(int id) {
 		for (int i = 0; i < enquiryList.size(); i++) {
 			Enquiry e = enquiryList.get(i);
@@ -172,10 +232,21 @@ public class EnquiryManager {
 		return false; // Not found or already replied
 	}
 
+	/**
+     * Adds an existing Enquiry instance to the list.
+     *
+     * @param enquiry the Enquiry to add
+     */
 	public void createEnquiryList(Enquiry enquiry) {
 		enquiryList.add(enquiry);
 	}
 
+	/**
+     * Retrieves the first enquiry for a specific project.
+     *
+     * @param project the Project to search
+     * @return the Enquiry found or null if none
+     */
 	public Enquiry getEnquiryByProject(Project project) {
 		for (Enquiry e : enquiryList) {
 			if (e.getProject().getProjectName().equalsIgnoreCase(project.getProjectName())) {
@@ -185,6 +256,12 @@ public class EnquiryManager {
 		return null;
 	}
 
+	/**
+     * Retrieves all enquiries (replied or not) for a given project.
+     *
+     * @param project the Project to filter by
+     * @return list of Enquiry for that project
+     */
 	public List<Enquiry> getEnquiryNOReply(Project project) {
 		List<Enquiry> proj = new ArrayList<>();
 
@@ -208,6 +285,12 @@ public class EnquiryManager {
 		return proj;
 	}
 
+	/**
+     * Edits the message of an enquiry if it has not been replied.
+     *
+     * @param id         the enquiry ID
+     * @param newMessage the new message content
+     */
 	public void editEnquiry(int id, String newMessage) {
 		for (Enquiry e : enquiryList) {
 			if (e.getEnquiryId() == id) {
@@ -224,6 +307,12 @@ public class EnquiryManager {
 		System.out.println("Enquiry not found.");
 	}
 
+	/**
+     * Sets a reply for an enquiry by ID.
+     *
+     * @param id    the enquiry ID
+     * @param reply the reply message to record
+     */
 	public void replyToEnquiry(int id, String reply) {
 		for (Enquiry e : enquiryList) {
 			if (e.getEnquiryId() == id) {

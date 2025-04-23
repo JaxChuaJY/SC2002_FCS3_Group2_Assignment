@@ -14,18 +14,39 @@ import enums.MaritalStatus;
 import interfaces.IFileHandler;
 import interfaces.IUserManager;
 
+/**
+ * Manages user authentication, loading from CSV, and password updates.
+ * <p>
+ * Supports Applicants, HDB Officers, and HDB Managers.
+ * Reads user data on initialization and provides login/logout functionality.
+ * </p>
+ */
 public class UserManager implements IUserManager{
+	/** In-memory list of all users loaded from files. */
 	private List<User> userList;
+    /** The currently authenticated user, or null if none. */
 	private User currentUser;
 	
-	// Map that stores the userType + fileName for writeFile_changePW
+	/**
+     * Maps each User subclass to its corresponding CSV filename for password updates.
+     */
 	private static Map<Class<? extends User>, String> userMap = Map.of(Applicant.class, "ApplicantList.csv",
 				HDBManager.class, "ManagerList.csv", HDBOfficer.class, "OfficerList.csv");
+	
+	/** Base directory for user CSV files. */
 	private static String directory = "data/";
 	
+    /** Paths to all user CSV files for initial loading. */
 	private static final String[] USER_FILES = {"data/ApplicantList.csv","data/ManagerList.csv","data/OfficerList.csv"};//,"data/ManagerList.csv","data/OfficerList.csv"};
+	
+	/** Handler for reading and writing CSV data. */
 	private final IFileHandler fileHandler;
 	
+	/**
+     * Constructs a UserManager and loads users from CSV files.
+     *
+     * @param fH the file handler to use for CSV operations
+     */
 	public UserManager(IFileHandler fH){
 		userList = new ArrayList<>();
 		fileHandler = fH;
@@ -33,6 +54,9 @@ public class UserManager implements IUserManager{
 		
 	}
 	
+	/**
+     * Loads users from each CSV file into memory, skipping headers.
+     */
 	private void loadUsersFromCSV() {
 		for (String filePath : USER_FILES) {
 			fileHandler.readFromFile(filePath).stream()
@@ -43,6 +67,13 @@ public class UserManager implements IUserManager{
 		}
 	}
 	
+	/**
+     * Creates a User instance based on the CSV file path and parsed values.
+     *
+     * @param file   the CSV file path
+     * @param values the CSV columns: name, NRIC, age, status, password
+     * @return a new User subclass instance, or null if file unrecognized
+     */
 	private User createUserFromFile(String file, String[] values) {
 		
 	    String name = values[0];
@@ -63,11 +94,15 @@ public class UserManager implements IUserManager{
 	            return null;
 	    }
 	}
-	
+
+	/**
+     * Updates the password for the given user in its CSV file.
+     *
+     * @param user the User whose password was changed
+     */
 	public static void writeFile_changePW(User user) {
 		String filename = userMap.get(user.getClass());
 
-		// Rewrite the whole file..., check if works
 		List<String> lines = new ArrayList<>();
 
 		try (Scanner scanner = new Scanner(new File(directory + filename))) {
@@ -106,6 +141,11 @@ public class UserManager implements IUserManager{
 
 	}
 	
+	/**
+     * Prompts console for NRIC and password and attempts to log in.
+     *
+     * @return true if login successful, false otherwise
+     */
 	public boolean login() {
 		try  {
 			Scanner sc = new Scanner(System.in);
@@ -139,16 +179,29 @@ public class UserManager implements IUserManager{
 		return false;
 	}
 	
+	/**
+     * Logs out the current user, clearing the session.
+     */
 	public void logout() {
 		currentUser = null;
 	}
 	
+	/**
+     * Prints all loaded users to the console for debugging.
+     */
 	public void printAllUser() {
 		for (User user : userList) {
 			System.out.println(user);
 		}
 	}
 	
+	/**
+     * Finds a user matching the provided NRIC and password.
+     *
+     * @param ic the NRIC to match
+     * @param pw the password to match
+     * @return the User if found, or null otherwise
+     */
 	public User findUserLogin(String ic, String pw) {
 		for (User user : userList) {
 			if (user.getNric().equals(ic) && user.getPassword().equals(pw)) {
@@ -158,10 +211,16 @@ public class UserManager implements IUserManager{
 		return null;
 	}
 	
+	/**
+     * @return the currently logged-in user, or null if none
+     */
 	public User getcurrentUser() {
 		return currentUser;
 	}
 	
+	/**
+     * Prompts the current user to change their password and persists change.
+     */
 	public void changePassword() {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Please input new password");
@@ -172,10 +231,21 @@ public class UserManager implements IUserManager{
 		
 	}
 
+	/**
+     * @param list sets the internal user list to the provided list
+     */
 	public void setList(List<User> list) {
 		this.userList = list;
 	}
 	
+	/**
+     * Searches for a user of specific class and name.
+     *
+     * @param clazz the User subclass to match
+     * @param name  the user's name to match
+     * @return the matching User
+     * @throws Exception if not found
+     */
 	public User searchUser_Type(Class<?> clazz, String name) throws Exception {
 	    for (User u : userList) {
 	        if (u.getClass().equals(clazz) && u.getName().equals(name)) {
@@ -186,19 +256,21 @@ public class UserManager implements IUserManager{
 	    throw new Exception("User does not exist in Repo " + name);
 	}
 
-	
-	
-	//REMOVE
-	public void addUser(User u) {
-		userList.add(u);
-	}
-
+	/**
+     * Re-initializes user data by reloading from CSV.
+     */
 	@Override
 	public void reIntialise() {
 		loadUsersFromCSV();
 		
 	}
 
+	/**
+     * Retrieves a User by NRIC for external lookup.
+     *
+     * @param nric the NRIC to match
+     * @return the User, or null if not found
+     */
 	@Override
 	public User getUser(String nric) {
 		return userList.stream()

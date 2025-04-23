@@ -1,13 +1,22 @@
 package main;
 
+/**
+ * Entry point for the BTO Management application.
+ */
 public class main {
 
 	// -----MAIN PROGRAM
+	/**
+     * Launches the BTO system, handling exceptions and
+     * iterating user menus until logout.
+     *
+     * @param args command-line arguments (ignored)
+     */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		BTOManagementSystem btoSys;
 		try {
-			btoSys = new BTOManagementSystem();
+			btoSys = setUpFactory.createSystem();
 			btoSys.startSystem();
 		
 
@@ -17,9 +26,6 @@ public class main {
 			e.printStackTrace();
 			return;
 
-			// **Add in error in reading files catch Exception error!
-			// Need to make the readUsers throw Exception but that is if wanted.
-			// It already throws an exception but DOES NOT end program.
 		}
 
 
@@ -28,7 +34,7 @@ public class main {
 		}while (btoSys.getUserManager().getcurrentUser() != null);
 		
 			
-		System.out.println("Exitting program...");
+		System.out.println("Exiting program...");
 
 	}
 
