@@ -2,17 +2,13 @@ package main;
 
 import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.stream.IntStream;
-
 import application.Application;
-import application.ApplicationManager;
 import enquiry.Enquiry;
 import enquiry.EnquiryManager;
 import enums.ApplicationStatus;
@@ -21,16 +17,13 @@ import enums.MaritalStatus;
 import interfaces.IApplicationManager;
 import interfaces.IFileHandler;
 import interfaces.IProjectManager;
+import interfaces.IProjectRegistration;
 import interfaces.IUserManager;
 import project.Project;
-import project.ProjectManager;
-import registration.ProjectRegistration;
 import registration.RegistrationForm;
 import user.Applicant;
 import user.HDBManager;
 import user.HDBOfficer;
-import user.User;
-import user.UserManager;
 
 /**
  * Command-line interface for the Build-To-Order (BTO) Management System.
@@ -50,7 +43,7 @@ public class BTOManagementSystem {
     private IProjectManager projectManager;
 
     /** Manages HDB Officer registrations for projects. */
-    private ProjectRegistration projectRegManager;
+    private IProjectRegistration projectRegManager;
 
     /** Manages BTO application lifecycle and persistence. */
     private IApplicationManager applicationManager;
@@ -62,23 +55,21 @@ public class BTOManagementSystem {
     private EnquiryManager enquiryManager;
 
 	/**
-     * Constructs the BTOManagementSystem, initializing all managers and file handlers.
-     *
-     * @throws Exception if initialization fails (e.g., file loading errors)
-     */
-    public BTOManagementSystem() throws Exception {
-		fileHandler = new FileHandler();
-		userManager = new UserManager(fileHandler);
-		projectManager = new ProjectManager(fileHandler, userManager);
-		projectRegManager = new ProjectRegistration(userManager, projectManager);
-		applicationManager = new ApplicationManager(projectManager, userManager, fileHandler);
-		enquiryManager = new EnquiryManager();
+	 * Constructs the BTOManagementSystem, initializing all managers and file handlers.
+	 *
+	 * @throws Exception if initialization fails (e.g., file loading errors)
+	 */
+	public BTOManagementSystem(IFileHandler fileHandler, IUserManager userManager, IProjectManager projectManager,
+			IProjectRegistration projectRegManager, IApplicationManager applicationManager,
+			EnquiryManager enquiryManager) throws Exception {
+		this.fileHandler = fileHandler;
+		this.userManager = userManager;
+		this.projectManager = projectManager;
+		this.projectRegManager = projectRegManager;
+		this.applicationManager = applicationManager;
+		this.enquiryManager = enquiryManager;
 	}
 
-	/**
-     * Starts the BTO system: prints users, performs login, and displays
-     * the initial menu if login succeeds.
-     */
 	public void startSystem() {
 		userManager.printAllUser();
 		login();
@@ -1044,12 +1035,12 @@ public class BTOManagementSystem {
  	}
 	
 	//-----Filter Settings
-	    /**
-		 * Displays filter settings menu for users to adjust project filters.
-		 *
-		 * 
-		 */
-		public void showFilterMenu() {
+    /**
+	 * Displays filter settings menu for users to adjust project filters.
+	 *
+	 * 
+	 */
+	public void showFilterMenu() {
 		boolean manager = userManager.getcurrentUser() instanceof HDBManager ? true : false;
 		Scanner sc = new Scanner(System.in);
 		while (true) {
@@ -1117,7 +1108,7 @@ public class BTOManagementSystem {
 	/**
 	 * @return the projectRegManager
 	 */
-	public ProjectRegistration getProjectRegManager() {
+	public IProjectRegistration getProjectRegManager() {
 		return projectRegManager;
 	}
 

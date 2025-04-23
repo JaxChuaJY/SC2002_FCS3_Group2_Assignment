@@ -16,7 +16,7 @@ public class main {
 		// TODO Auto-generated method stub
 		BTOManagementSystem btoSys;
 		try {
-			btoSys = new BTOManagementSystem();
+			btoSys = setUpFactory.createSystem();
 			btoSys.startSystem();
 		
 
@@ -34,7 +34,7 @@ public class main {
 		}while (btoSys.getUserManager().getcurrentUser() != null);
 		
 			
-		System.out.println("Exitting program...");
+		System.out.println("Exiting program...");
 
 	}
 
