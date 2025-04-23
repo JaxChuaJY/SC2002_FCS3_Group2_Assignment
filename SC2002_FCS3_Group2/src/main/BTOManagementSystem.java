@@ -746,7 +746,7 @@ public class BTOManagementSystem {
 		enquiryManager.loadFromCSV("data/enquiries.csv", userManager, projectManager);
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showEnquiryManager((HDBManager) userManager.getcurrentUser());
-		} else {
+		} else if (userManager.getcurrentUser() instanceof HDBOfficer) {
 			Scanner sc = new Scanner(System.in);
 			System.out.println("Continue as");
 			System.out.println("1. HDB Officer");
@@ -761,6 +761,8 @@ public class BTOManagementSystem {
 				System.out.println("Invalid Choice");
 				return;
 			}
+		} else {
+			showEnquiryApplicant((Applicant) userManager.getcurrentUser());
 		}
 	}
 
@@ -778,20 +780,21 @@ public class BTOManagementSystem {
 		System.out.println("**--Applicant Enquiry Page");
 		System.out.println("1. View enquries");
 		System.out.println("2. Create enquiry");
-		System.out.println("3. EXIT");
+		System.out.println("3. Delete enquiry");
+		System.out.println("4. EXIT");
 
 		int choice = sc.nextInt(); // try-catch for wrong input type (string/char/etc.)
 
 		while (true) {
 			switch (choice) {
-			case 1:
+			case 1:				
 				System.out.println("-----All enquries made by user-----");
 				List<Enquiry> enquiryList = enquiryManager.getEnquiry_filterSend(user);
 
 				for (int i = 0; i < enquiryList.size(); i++) {
 					System.out.println("--------------------------");
-					System.out.println((i + 1) + ". " + enquiryList.get(i).getProject() + "\nMessage:"
-							+ enquiryList.get(i).getMessage());
+					System.out.println((i + 1) + ". " + enquiryList.get(i).getProject() + "\nMessage:" 
+							   + enquiryList.get(i).getMessage());
 					System.out.println("--------------------------");
 				}
 
@@ -814,6 +817,7 @@ public class BTOManagementSystem {
 			case 2:
 				System.out.println("-----Create Enquiry (Select Project)-----");
 				System.out.println("Select Project");
+				// I do not know if project need filter here or not
 				List<Project> projectList = projectManager.getProjectList(user);
 				int listSize = projectList.size();
 
@@ -851,6 +855,37 @@ public class BTOManagementSystem {
 				}
 				break;
 			case 3:
+				System.out.println("-----All enquries made by user-----");
+				List<Enquiry> test = enquiryManager.getEnquiry_filterSend(user);
+
+				for (int i = 0; i < test.size(); i++) {
+					System.out.println("--------------------------");
+					System.out.println((i + 1) + ". " + test.get(i).getProject() + "\nMessage:" + test.get(i).getMessage());
+					System.out.println("--------------------------");
+				}
+
+				System.out.println((test.size() + 1) + ". EXIT");
+
+				choice = sc.nextInt();
+				sc.nextLine();
+
+				if (choice == (test.size() + 1)) {
+					System.out.println("Exiting...");
+					break;
+				} else if (choice <= test.size() && choice > 0) {
+					Enquiry selected = test.get(choice-1);
+					if (enquiryManager.deleteCheck(selected) == true) {
+						enquiryManager.deleteEnquiry(selected);
+					}
+					else {
+						System.out.println("Enquiry Replied, therefore not allowed to delete.");
+					}
+					break;
+				} else {
+					System.out.println("Bad input");
+				}
+				break;
+			case 4:
 				System.out.println("Exiting...");
 				return;
 			default:
@@ -861,7 +896,8 @@ public class BTOManagementSystem {
 			System.out.println("**--Applicant Enquiry Page");
 			System.out.println("1. View enquries");
 			System.out.println("2. Create enquiry");
-			System.out.println("3. EXIT");
+			System.out.println("3. Delete enquiry");
+			System.out.println("4. EXIT");
 			choice = sc.nextInt();
 			sc.nextLine();
 		}
