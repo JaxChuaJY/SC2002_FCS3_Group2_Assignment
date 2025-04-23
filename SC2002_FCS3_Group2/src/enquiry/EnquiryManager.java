@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import interfaces.IProjectManager;
 import interfaces.IUserManager;
+import interfaces.IEnquiryManager;
 import project.Project;
 import user.User;
 
@@ -23,7 +24,9 @@ import user.User;
  * querying by sender or project, editing messages, and replying.
  * </p>
  */
-public class EnquiryManager {
+public class EnquiryManager implements IEnquiryManager {
+	private IProjectManager projectManager;
+	private IUserManager userManager;
 	/** List of all loaded enquiries. */
 	private List<Enquiry> enquiryList;
     /** Formatter for parsing and formatting dates in dd/MM/yyyy pattern. */
