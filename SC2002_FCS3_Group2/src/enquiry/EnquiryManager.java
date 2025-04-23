@@ -25,8 +25,6 @@ import user.User;
  * </p>
  */
 public class EnquiryManager implements IEnquiryManager {
-	private IProjectManager projectManager;
-	private IUserManager userManager;
 	/** List of all loaded enquiries. */
 	private List<Enquiry> enquiryList;
     /** Formatter for parsing and formatting dates in dd/MM/yyyy pattern. */
@@ -36,9 +34,7 @@ public class EnquiryManager implements IEnquiryManager {
     /**
      * Constructs a new EnquiryManager with an empty enquiry list.
      */
-	public EnquiryManager(IProjectManager projectManager, IUserManager userManager) {
-		this.projectManager = projectManager;
-	    	this.userManager = userManager;
+	public EnquiryManager() {
 		enquiryList = new ArrayList<>();
 	}
 
@@ -59,13 +55,13 @@ public class EnquiryManager implements IEnquiryManager {
 		if (!file.exists()) {
 			System.out.println("CSV file not found. Creating an empty file.");
 			try (FileWriter writer = new FileWriter(filename)) {
-				writer.write("EnquiryId,Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+				writer.write("SenderNric,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
 			} catch (IOException e) {
 				System.out.println("Error creating CSV file: " + e.getMessage());
 			}
 			return; // keep the current enquiryList (not replaced)
 		}
-
+		
 		enquiryList.clear();
 
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -73,11 +69,7 @@ public class EnquiryManager implements IEnquiryManager {
 			while ((line = br.readLine()) != null) {
 				String[] parts = parseCSVLine(line);
 				if (parts.length >= 7) {
-					// String sender = parts[0];
-					// String project = parts[1];
-					//User u;
 					try {
-						//u = userManager.searchUser_Type(User.class, parts[0]);
 						String senderNric = parts[0];
 						Project p = projectManager.getProject(parts[1]);
 						String message = parts[2];
@@ -90,7 +82,7 @@ public class EnquiryManager implements IEnquiryManager {
 						if (sender == null) {
 							System.out.println("User not found for NRIC: " + senderNric);
 							continue;
-						}	
+						}
 
 						Enquiry e = new Enquiry(sender, p, message);
 						e.setMessage(message);
@@ -154,7 +146,7 @@ public class EnquiryManager implements IEnquiryManager {
 	public void exportToCSV(String filename) {
 		try (FileWriter writer = new FileWriter(filename)) {
 			// Write CSV header
-			writer.write("Sender,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
+			writer.write("SenderNric,Project,Message,Reply,DateCreated,DateReplied,Replied\n");
 
 			for (Enquiry e : enquiryList) {
 				StringBuilder sb = new StringBuilder();
@@ -204,7 +196,6 @@ public class EnquiryManager implements IEnquiryManager {
 		enquiryList.add(e);
 		System.out.println("Date Created: " + e.getDateCreated());
 		exportToCSV(CSV_PATH);
-		// System.out.println("Enquiry added with ID: " + e.getEnquiryId());
 	}
 
 	/**
@@ -229,7 +220,7 @@ public class EnquiryManager implements IEnquiryManager {
      * @return list of matching Enquiry objects
      */
 	public List<Enquiry> getEnquiry_filterSend(User user) {
-		return enquiryList.stream().filter(en -> en.getSender().equals(user.getName())).collect(Collectors.toList());
+		return enquiryList.stream().filter(en -> en.getSender().equals(user)).collect(Collectors.toList());
 	}
 
 	/**
