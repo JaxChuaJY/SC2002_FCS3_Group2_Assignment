@@ -221,20 +221,6 @@ public class ProjectManager implements IProjectManager {
 
 		return true;
 	}
-
-	// REMEMBER TO REMOVE!
-	public void printList() {
-
-		System.out.println("============ProjectManager PRINT ALL============");
-
-		for (Project p : projectList) {
-			System.out.println("-----------");
-			System.out.print(p);
-			p.printOfficerList();
-			p.printFlatSupply();
-			System.out.println("----------");
-		}
-	}
 	
 	//--------ProjectManager functions
 	/**

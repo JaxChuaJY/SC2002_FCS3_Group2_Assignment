@@ -459,7 +459,6 @@ public class BTOManagementSystem {
      * @param user the Applicant whose menu is displayed
      */
 	public void showMenuApplicant(Applicant user) {
-		// Prints only 1 application? idk
 		Scanner sc = new Scanner(System.in);
 
 		Application application = user.getApplication();
@@ -820,7 +819,6 @@ public class BTOManagementSystem {
 			case 2:
 				System.out.println("-----Create Enquiry (Select Project)-----");
 				System.out.println("Select Project");
-				// I do not know if project need filter here or not
 				List<Project> projectList = projectManager.getProjectList(user);
 				int listSize = projectList.size();
 

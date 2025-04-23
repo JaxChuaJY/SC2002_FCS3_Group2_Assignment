@@ -1,7 +1,5 @@
 package user;
 
-import java.io.IOException;
-
 /**
  * Utility class for validating user input formats.
  * <p>

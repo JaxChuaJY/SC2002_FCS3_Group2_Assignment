@@ -26,9 +26,6 @@ public class main {
 			e.printStackTrace();
 			return;
 
-			// **Add in error in reading files catch Exception error!
-			// Need to make the readUsers throw Exception but that is if wanted.
-			// It already throws an exception but DOES NOT end program.
 		}
 
 

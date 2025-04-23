@@ -103,7 +103,6 @@ public class UserManager implements IUserManager{
 	public static void writeFile_changePW(User user) {
 		String filename = userMap.get(user.getClass());
 
-		// Rewrite the whole file..., check if works
 		List<String> lines = new ArrayList<>();
 
 		try (Scanner scanner = new Scanner(new File(directory + filename))) {
@@ -255,13 +254,6 @@ public class UserManager implements IUserManager{
 	    }
 
 	    throw new Exception("User does not exist in Repo " + name);
-	}
-
-	
-	
-	//REMOVE
-	public void addUser(User u) {
-		userList.add(u);
 	}
 
 	/**

@@ -42,8 +42,12 @@ public class ProjectRegistration implements IProjectRegistration{
     /** Filename for registration data CSV. */
 	private static String registrationFileName = "RegistrationList.csv";
 	
-	
-	//REMOVE?
+	/**
+     * Constructs the manager, loading projects via the given file and user handlers.
+     *
+     * @param ur handler for user lookups
+     * @param pr handler for project lookups
+     */
 	public ProjectRegistration(IUserManager ur, IProjectManager pr){
 		list = readRegForms(ur, pr);
 	}
@@ -129,7 +133,6 @@ public class ProjectRegistration implements IProjectRegistration{
      */
 	public void writeFile_setRegForm(RegistrationForm f) {
 
-		// Rewrite the whole file..., check if works
 		List<String> lines = new ArrayList<>();
 
 		try (Scanner scanner = new Scanner(new File(directory + registrationFileName))) {
@@ -174,7 +177,6 @@ public class ProjectRegistration implements IProjectRegistration{
      * @param f the RegistrationForm containing officer and project
      */
 	public void writeFile_addOfficer(RegistrationForm f) {
-		// Rewrite the whole file..., check if works
 		List<String> lines = new ArrayList<>();
 
 		try (Scanner scanner = new Scanner(new File(directory + projectFileName))) {
@@ -186,7 +188,6 @@ public class ProjectRegistration implements IProjectRegistration{
 				String line = scanner.nextLine();
 				String[] data = line.split(",");
 
-				// Does it contain the NRIC?
 				if (data[0].equals(f.getProject().getProjectName())) {
 					lines.add(line.substring(0, line.length()-1) + "," + f.getRegisteredBy().getName() + "\"\n");
 				} else {
@@ -241,7 +242,7 @@ public class ProjectRegistration implements IProjectRegistration{
 		form.rejectStatus();
 	}
 	
-	//REMOVE -- For checking
+
 	 /**
      * Prints pending and approved registrations for a manager.
      *
