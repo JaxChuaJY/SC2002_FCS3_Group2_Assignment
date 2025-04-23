@@ -36,7 +36,11 @@ public class FilterSettings {
      * @param location the neighbourhood name to filter by
      */
     public void setLocation(String location) {
-        this.location = location;
+    	if (location.equals("None")) {
+     		this.location = null;
+     	}else {
+     		this.location = location;
+     	}
     }
 
     /**

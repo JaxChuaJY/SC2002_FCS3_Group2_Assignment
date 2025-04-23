@@ -56,7 +56,8 @@ public class HDBManager extends User {
 			System.out.println("4. Enquiries menu");
 			System.out.println("5. Registration Section");
 			System.out.println("6. Generate report");
-			System.out.println("7. EXIT");
+			System.out.println("7. Filter settings");
+			System.out.println("8. EXIT");
 			choice = sc.nextInt();
 
 			try {
@@ -81,6 +82,9 @@ public class HDBManager extends User {
 					btoSys.showReportMenu();
  					break;
 				case 7:
+					btoSys.showFilterMenu();
+ 					break;
+				case 8:
 					btoSys.logout();
 					return;
 				default:

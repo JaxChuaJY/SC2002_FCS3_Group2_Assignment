@@ -158,6 +158,7 @@ public class BTOManagementSystem {
 						System.out.print("\nEnter room type (2-room or 3-room)");
 						FlatType flatChoice = FlatType.fromString(sc.nextLine());
 						applicationManager.createApplication(userManager.getcurrentUser(), projectManager.getProject(choice), flatChoice);
+						applicationManager.saveApplicationtoCSV();
 					}
 					else if (applyChoice.equalsIgnoreCase("n")){
 						continue;
@@ -1048,10 +1049,10 @@ public class BTOManagementSystem {
 	    /**
 		 * Displays filter settings menu for users to adjust project filters.
 		 *
-		 * @param user the current User whose filters are modified
+		 * 
 		 */
-		public void showFilterMenu(User user) {
-		boolean manager = user instanceof HDBManager ? true : false;
+		public void showFilterMenu() {
+		boolean manager = userManager.getcurrentUser() instanceof HDBManager ? true : false;
 		Scanner sc = new Scanner(System.in);
 		while (true) {
 			System.out.println("=====Filters=====");
@@ -1068,24 +1069,24 @@ public class BTOManagementSystem {
 
 			switch (choice) {
 			case 1:
-				System.out.println("Please input location");
-				user.getFilters().setLocation(sc.next());
+				System.out.println("Please input location:(Input 'None' if none)");
+				userManager.getcurrentUser().getFilters().setLocation(sc.next());
 				System.out.println("Location set!");
 				break;
 			case 2:
 				System.out.println("Please input FlatType ('2-room'/'3-room')");
 				// Check for invalid inputs!
-				user.getFilters().setFlatType(FlatType.fromString(sc.next()));
+				userManager.getcurrentUser().getFilters().setFlatType(FlatType.fromString(sc.next()));
 				break;
 			case 3:
 				if (manager) {
 					System.out.println("See projects managed by others? (y/n)");
 					String input = sc.next();
 					if (input.toLowerCase().equals("y")) {
-						user.getFilters().setmanagerViewALL(true);
+						userManager.getcurrentUser().getFilters().setmanagerViewALL(true);
 						break;
 					} else if (input.toLowerCase().equals("n")) {
-						user.getFilters().setmanagerViewALL(false);
+						userManager.getcurrentUser().getFilters().setmanagerViewALL(false);
 						break;
 					} else {
 						System.out.println("Invalid input");
