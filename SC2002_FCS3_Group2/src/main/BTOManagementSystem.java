@@ -742,6 +742,7 @@ public class BTOManagementSystem {
      * Displays enquiry-related menus for sending or replying to enquiries.
      */
 	public void showEnquiryMenu() {
+		enquiryManager.loadFromCSV("data/enquiries.csv", userManager, projectManager);
 		if (userManager.getcurrentUser() instanceof HDBManager) {
 			showEnquiryManager((HDBManager) userManager.getcurrentUser());
 		} else if (userManager.getcurrentUser() instanceof HDBOfficer) {
@@ -750,6 +751,7 @@ public class BTOManagementSystem {
 			System.out.println("1. HDB Officer");
 			System.out.println("2. Applicant");
 			int choice = sc.nextInt();
+			sc.nextLine();
 			if (choice == 1) {
 				showEnquiryOfficer((HDBOfficer) userManager.getcurrentUser());
 			} else if (choice == 2) {
@@ -795,18 +797,19 @@ public class BTOManagementSystem {
 				System.out.println((enquiryList.size() + 1) + ". EXIT");
 
 				choice = sc.nextInt();
+				sc.nextLine();
 
 				if (choice == (enquiryList.size() + 1)) {
 					System.out.println("Exiting...");
 					return;
 				} else if (choice < enquiryList.size() - 1 && choice > 0) {
-					Enquiry selected = enquiryList.get(choice);
+					Enquiry selected = enquiryList.get(choice-1);
 					System.out.print(selected);
 					break;
 				} else {
 					System.out.println("Bad input");
 				}
-
+				break;
 			case 2:
 				System.out.println("-----Create Enquiry (Select Project)-----");
 				System.out.println("Select Project");
@@ -829,6 +832,7 @@ public class BTOManagementSystem {
 				System.out.println("-".repeat(27));
 				System.out.println((listSize + 1) + ". EXIT");
 				choice = sc.nextInt();
+				sc.nextLine();
 
 				if (1 <= choice && choice <= listSize) {
 					Project selected = projectList.get(choice - 1);
@@ -849,6 +853,12 @@ public class BTOManagementSystem {
 				break;
 			}
 
+			System.out.println("**--Applicant Enquiry Page");
+			System.out.println("1. View enquries");
+			System.out.println("2. Create enquiry");
+			System.out.println("3. EXIT");
+			choice = sc.nextInt();
+			sc.nextLine();
 		}
 	}
 
@@ -877,7 +887,7 @@ public class BTOManagementSystem {
 					return;
 				} else if (1 <= choice && choice <= user.getManagedProject().size()) {
 
-					Project selected = user.getManagedProject().get(choice);
+					Project selected = user.getManagedProject().get(choice-1);
 					List<Enquiry> list = enquiryManager.getEnquiryNOReply(selected);
 
 					if (list.isEmpty()) {
@@ -891,7 +901,8 @@ public class BTOManagementSystem {
 						}
 						System.out.println((list.size() + 1) + ". EXIT");
 						choice = sc.nextInt();
-
+						sc.nextLine();
+						
 						while (true) {
 							if (choice == (list.size() + 1)) {
 								System.out.println("Exiting...");
@@ -899,7 +910,7 @@ public class BTOManagementSystem {
 							} else if (1 <= choice && choice <= list.size()) {
 								System.out.println("Please type reply:");
 								String message = sc.next();
-								enquiryManager.replyToEnquiry(list.get(choice).getEnquiryId(), message);
+								enquiryManager.replyToEnquiry(list.get(choice-1).getEnquiryId(), message);
 								System.out.println("Reply made!");
 								return;
 
@@ -959,6 +970,7 @@ public class BTOManagementSystem {
 						}
 						System.out.println((list.size() + 1) + ". EXIT");
 						choice = sc.nextInt();
+						sc.nextLine();
 
 						while (true) {
 							if (choice == (list.size() + 1)) {
@@ -967,7 +979,7 @@ public class BTOManagementSystem {
 							} else if (1 <= choice && choice <= list.size()) {
 								System.out.println("Please type reply:");
 								String message = sc.next();
-								enquiryManager.replyToEnquiry(list.get(choice).getEnquiryId(), message);
+								enquiryManager.replyToEnquiry(list.get(choice-1).getEnquiryId(), message);
 								System.out.println("Reply made!");
 								return;
 
