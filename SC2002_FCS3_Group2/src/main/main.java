@@ -1,5 +1,8 @@
 package main;
 
+import registration.RegistrationForm;
+import user.HDBOfficer;
+
 /**
  * Entry point for the BTO Management application.
  */
@@ -18,8 +21,7 @@ public class main {
 		try {
 			btoSys = setUpFactory.createSystem();
 			btoSys.startSystem();
-		
-
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Catches in main");
