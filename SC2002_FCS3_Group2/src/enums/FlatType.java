@@ -35,6 +35,6 @@ public enum FlatType {
      * @return flat type string with hyphens and numeric values (e.g. "2-room", "3-room")
      */
     public String toDisplayString() {
-        return name().replace("_", "-").replace("TWO", "2").replace("THREE", "3");
+        return name().replace("_", "-").replace("TWO", "2").replace("THREE", "3").replace("ROOM", "room");
     }
 }
