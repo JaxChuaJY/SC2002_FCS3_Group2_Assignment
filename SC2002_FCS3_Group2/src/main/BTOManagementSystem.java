@@ -195,7 +195,7 @@ public class BTOManagementSystem {
 						Project proj = projectManager.getProject(str_input);
 						System.out.print(proj.toString());
 						
-						System.out.println("Input action [EDIT/TOGGLE_VIS/BACK]:");
+						System.out.println("\nInput action [EDIT/TOGGLE_VIS/BACK]:");
 						str_input = sc.next();
 						
 						while(true) {
