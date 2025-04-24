@@ -75,7 +75,8 @@ public class BTOManagementSystem {
 		//userManager.printAllUser(); -- easy user reference
 		login();
 		if (userManager.getcurrentUser() != null) {
-			System.out.println(userManager.getcurrentUser());
+			System.out.println("Logged in as " + userManager.getcurrentUser().getName());
+		//	System.out.println(userManager.getcurrentUser()); -- to check who is logged in
 		} else {
 			System.out.println("Login failed. Exiting system.");
 		}
