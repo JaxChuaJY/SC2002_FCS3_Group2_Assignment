@@ -91,5 +91,6 @@ public interface IProjectManager {
      * @param proj the Project object with updated information
      */
 	void toggleVisibility(Project proj);
-	
+
+	void writeToCSV(boolean append);
 }

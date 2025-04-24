@@ -152,6 +152,7 @@ public class BTOManagementSystem {
 						FlatType flatChoice = FlatType.fromString(sc.nextLine());
 						applicationManager.createApplication(userManager.getcurrentUser(), projectManager.getProject(choice), flatChoice);
 						applicationManager.saveApplicationtoCSV();
+						projectManager.updateFlatRooms(proj, flatChoice, -1);
 					}
 					else if (applyChoice.equalsIgnoreCase("n")){
 						continue;
@@ -184,6 +185,7 @@ public class BTOManagementSystem {
 					projectManager.viewAllProj(userManager.getcurrentUser());
 					System.out.print("\n");
 					System.out.print("Enter project's name you would like to view details (enter -1 to exit):");
+					sc.nextLine();
 					String str_input = sc.nextLine();
 					
 					if (str_input.equalsIgnoreCase("-1")) {
@@ -198,11 +200,12 @@ public class BTOManagementSystem {
 						
 						while(true) {
 							if (str_input.toUpperCase().equals("EDIT")) {
-								//edit function;
-								//need write into file
+								projectManager.editProject(proj);
+								break;
 							} else if (str_input.toUpperCase().equals("TOGGLE_VIS")) {
-								//toggle
-								//need write into file
+								projectManager.toggleVisibility(proj);
+								projectManager.writeToCSV(false);
+								break;
 							} else if (str_input.toUpperCase().equals("BACK")){
 								System.out.println("Going back...");
 								break;
@@ -222,10 +225,12 @@ public class BTOManagementSystem {
 				break;
 			case 4:
 				System.out.print("Enter Project name: ");
+				sc.nextLine();
 				projectManager.removeProject(sc.nextLine());
 				break;
 			case 5:
 				System.out.print("Enter Project you would like to edit: ");
+				sc.nextLine();
 				Project proj = projectManager.getProject(sc.nextLine());
 				if (proj != null){
 					projectManager.editProject(proj);
@@ -237,6 +242,7 @@ public class BTOManagementSystem {
 				}
 			case 6:
 				System.out.print("Enter Project you would like to Toggle Visibility: ");
+				sc.nextLine();
 				proj = projectManager.getProject(sc.nextLine());
 				if (proj != null){
 					projectManager.toggleVisibility(proj);
