@@ -128,7 +128,7 @@ public class ProjectManager implements IProjectManager {
 					}
 				}
 			}
-
+			project.setVisible(!LocalDate.now().isBefore(project.getOpeningDate()) && !LocalDate.now().isAfter(project.getClosingDate()));
 			projectList.add(project);
 
 		}
@@ -144,6 +144,7 @@ public class ProjectManager implements IProjectManager {
      * @param append if true, preserves header and appends; false overwrites
      */
 	public void writeToCSV(boolean append) {
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("M/d/yyyy");
 		 try (FileWriter writer = new FileWriter(directory+projectFileName, append)) { 
 			 if (!append) {
 		        	writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer\n");
@@ -156,12 +157,12 @@ public class ProjectManager implements IProjectManager {
 		        	
 					for (FlatType type : proj.getFlatTypes()) {
 						SimpleEntry<Integer, Double> entry = flatSupply.get(type);
-						writer.append(type.name()).append(",")
+						writer.append(type.toDisplayString()).append(",")
 		                		.append(String.valueOf(entry.getKey())).append(",")
 		                		.append(String.valueOf(entry.getValue())).append(",");
 					}
-					writer.append(proj.getOpeningDate().toString()).append(",")
-					.append(proj.getClosingDate().toString()).append(",")
+					writer.append(proj.getOpeningDate().format(format)).append(",")
+					.append(proj.getClosingDate().format(format)).append(",")
 					.append(proj.getManager().getName().toString()).append(",")
 					.append(Integer.toString(proj.getOfficerSlots())).append(",");
 					List<String> officerNames = proj.getOfficerList().stream().map(HDBOfficer::getName).toList();
@@ -263,13 +264,14 @@ public class ProjectManager implements IProjectManager {
 		LocalDate closeDate = LocalDate.parse(sc.next(), format);
 		System.out.print("\nEnter number of Officer Slots: ");
 		int offSlots = sc.nextInt();
-		do {
+		while (offSlots > 10) {
 			System.out.println("Officer Slot too big, enter again: ");
 			offSlots = sc.nextInt();
-		}while (offSlots > 10);
+		}
 		Project newProj = new Project(name, neighbourhood, flatMap, openDate, closeDate, offSlots);
+		newProj.setVisible(!LocalDate.now().isBefore(newProj.getOpeningDate()) && !LocalDate.now().isAfter(newProj.getClosingDate()));
 		newProj.addManager(manager);
-		writeToCSV(true);
+		writeToCSV(false);
 	}
 	
     /**
@@ -284,6 +286,7 @@ public class ProjectManager implements IProjectManager {
 		Project project = null;
 		Scanner sc = new Scanner(System.in);
 		System.out.print("\nEnter project name you would like to see: ");
+		sc.nextLine();
 		String projName = sc.nextLine();
 		project = this.getProject(projName);
 		if (project == null) {
@@ -368,11 +371,13 @@ public class ProjectManager implements IProjectManager {
 		switch (choice){
 		case 1:
 			System.out.print("Enter new Project Name: ");
+			sc.nextLine();
 			proj.setProjectName(sc.nextLine());
 			System.out.print("\nName Updated");
 			break;
 		case 2:
 			System.out.print("Enter new Neighbourhood for Project: ");
+			sc.nextLine();
 			proj.setNeighbourhood(sc.nextLine());
 			System.out.print("\nNeighbourhood Updated");
 			break;
@@ -414,6 +419,7 @@ public class ProjectManager implements IProjectManager {
 	        break;
 		case 7:
 			System.out.print("Enter new Opening Date (yyyy-MM-dd): ");
+			sc.nextLine();
 			String openDateStr = sc.nextLine();
 	        LocalDate openDate = LocalDate.parse(openDateStr);
 	        proj.setOpeningDate(openDate);
@@ -421,6 +427,7 @@ public class ProjectManager implements IProjectManager {
 	        break;
 		case 8:
 			System.out.print("Enter new Closing Date (yyyy-MM-dd): ");
+			sc.nextLine();
 			String closeDateStr = sc.nextLine();
 	        LocalDate closeDate = LocalDate.parse(closeDateStr);
 	        proj.setClosingDate(closeDate);
