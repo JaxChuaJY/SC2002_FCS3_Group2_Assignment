@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import enums.MaritalStatus;
-import interfaces.IOfficerRegister;
 import main.BTOManagementSystem;
 import project.Project;
 
@@ -17,7 +16,7 @@ import project.Project;
  * register for projects as officers, and navigate officer-specific menus.
  * </p>
  */
-public class HDBOfficer extends Applicant implements IOfficerRegister {
+public class HDBOfficer extends Applicant {
 	
 	/**
      * List of projects this officer is assigned to manage.
@@ -116,25 +115,13 @@ public class HDBOfficer extends Applicant implements IOfficerRegister {
 		 * */
 	}
 
-	/**
-     * Registers this officer for project assignments (stub).
-     */
-	@Override
-	public void registerProject() {
-		// TODO Auto-generated method stub
-
-	}
+	
 
     /**
      * Returns a summary of this officer's registration (stub).
      *
      * @return registration details as a String
      */
-	@Override
-	public String viewRegistration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
      * Retrieves the list of projects managed by this officer.

@@ -238,7 +238,6 @@ public class EnquiryManager implements IEnquiryManager {
      *
      * @param  enquiry to delete
      */
-
 	public void deleteEnquiry(Enquiry enquiry) {
 		boolean removed = enquiryList.remove(enquiry);
 		if (removed) {

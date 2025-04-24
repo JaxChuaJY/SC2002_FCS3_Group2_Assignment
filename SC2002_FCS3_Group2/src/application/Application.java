@@ -49,15 +49,21 @@ public class Application {
         this.status = status;
     }
     
+    /**
+     *Reverts status back to previous saved status
+     */
     public void revertStatus() {
         this.status = this.previousStatus;
     }
+    
+    /**
+     *Get Previous Status
+     *
+     *@return the previous status
+     */
     public ApplicationStatus getPreviousStatus() {
         return this.previousStatus;
     }
-	public void viewProject() {
-		System.out.print(project);
-	}
 	
 	/**
      * Gets the project associated with this application.
@@ -86,6 +92,11 @@ public class Application {
 		return this.status;
 	}
 	
+	/**
+     *Get the flatType associated with this application
+     *
+     *@return the application's flat type
+     */
 	public FlatType getFlatType() {
 		return this.flatType;
 	}

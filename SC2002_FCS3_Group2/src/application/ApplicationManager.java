@@ -272,7 +272,12 @@ public class ApplicationManager implements IApplicationManager {
 		application.setStatus(ApplicationStatus.WITHDRAW_REQUEST);
 		
 	}
-
+	
+	/**
+	 * Books a flat for the applicant
+	 *
+	 * @param application the application used to book a flat
+	 */
 	@Override
 	public void bookFlat(Application application) {
 		if (application == null) {
@@ -302,6 +307,11 @@ public class ApplicationManager implements IApplicationManager {
 	    fileHandler.writeToFile(fileName, List.of(receipt.toString()));
 	}
 	
+	/**
+	 * View receipt of application
+	 *
+	 * @param application the application in question
+	 */
 	@Override
 	public void viewReceipt(Application application) {
 		if (application == null) throw new IllegalArgumentException("Application cannot be null.");
@@ -310,6 +320,15 @@ public class ApplicationManager implements IApplicationManager {
 		fileHandler.readFromFile(fileName).stream().forEach(System.out::println);
 	}
 	
+	/**
+	 * Generate report with filters
+	 *
+	 * @param maritalStatus used as filter for marital status
+	 * @param flatType used as filter for flat type
+	 * @param minAge used as filter for minimum age
+	 * @param maxAge used as filter for maximum age
+	 * @param projectName used as filter for project Name 
+	 */
 	@Override
 	public List<String> generateReport(Optional<MaritalStatus> maritalStatus,
 							            Optional<FlatType> flatType,
