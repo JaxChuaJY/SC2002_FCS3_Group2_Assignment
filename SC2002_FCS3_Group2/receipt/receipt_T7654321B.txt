@@ -1,0 +1,11 @@
+==== HDB BTO Flat Booking Receipt ====
+Name: Sarah
+NRIC: T7654321B
+Age: 40
+Marital Status: MARRIED
+
+Flat Type Booked: THREE_ROOM
+Project Name: Acacia Breeze
+Location: Yishun
+Booking Status: SUCCESSFUL
+
