@@ -224,19 +224,29 @@ public class EnquiryManager implements IEnquiryManager {
 	}
 
 	/**
-     * Checks if an enquiry with given ID is deletable (not replied).
+     * Checks if an enquiry is deletable (not replied).
      *
-     * @param id the enquiry ID to check
-     * @return true if found and not replied, false otherwise
+     * @param  enquiry to check
+     * @return status
      */
-	public boolean deleteCheck(int id) {
-		for (int i = 0; i < enquiryList.size(); i++) {
-			Enquiry e = enquiryList.get(i);
-			if (e.getEnquiryId() == id) {
-				return !e.isReplied(); // Only deletable if not replied
-			}
+	public boolean deleteCheck(Enquiry enquiry) {
+		return !enquiry.isReplied(); //reply status
+	}
+
+	/**
+     * Deletes an enquiry.
+     *
+     * @param  enquiry to delete
+     */
+
+	public void deleteEnquiry(Enquiry enquiry) {
+		boolean removed = enquiryList.remove(enquiry);
+		if (removed) {
+			exportToCSV(CSV_PATH);
+			System.out.println("Enquiry deleted!");
+		} else {
+			System.out.println("Enquiry not found.");
 		}
-		return false; // Not found or already replied
 	}
 
 	/**
