@@ -113,7 +113,7 @@ public class ProjectManager implements IProjectManager {
 
 			}
 
-			if (!items[12].isEmpty()) {
+			if (items.length != 12) {
 				String[] offList = items[12].split("\\|");
 				for (int i = 12; i < items.length; i++) {
 					// getOfficer from officer manager using name

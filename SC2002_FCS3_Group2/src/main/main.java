@@ -20,7 +20,6 @@ public class main {
 		BTOManagementSystem btoSys;
 		try {
 			btoSys = setUpFactory.createSystem();
-			
 			btoSys.startSystem();
 			
 		} catch (Exception e) {

@@ -187,7 +187,12 @@ public class ProjectRegistration implements IProjectRegistration{
 				String[] data = line.split(",");
 
 				if (data[0].equals(f.getProject().getProjectName())) {
-					lines.add(line.substring(0, line.length()) + "|" + f.getRegisteredBy().getName() + "\n");
+					if (data.length == 12) {
+						lines.add(line + f.getRegisteredBy().getName() + "\n");
+					}else {
+						lines.add(line.substring(0, line.length()) + "|" + f.getRegisteredBy().getName() + "\n");
+					}
+					
 				} else {
 					lines.add(line + "\n");
 				}
