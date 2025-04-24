@@ -506,7 +506,7 @@ public class ProjectManager implements IProjectManager {
 	 */
 	public Project getProject(String projectName) {
 		// TODO Auto-generated method stub
-		List<Project> list = this.projectList.stream().filter(p -> p.getProjectName().equals(projectName))
+		List<Project> list = this.projectList.stream().filter(p -> p.getProjectName().equalsIgnoreCase(projectName))
 				.collect(Collectors.toList());
 
 		if (list.size() == 1) {
