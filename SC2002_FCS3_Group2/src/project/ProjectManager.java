@@ -180,8 +180,8 @@ public class ProjectManager implements IProjectManager {
 					.append(proj.getManager().getName().toString()).append(",")
 					.append(Integer.toString(proj.getOfficerSlots())).append(",");
 					List<String> officerNames = proj.getOfficerList().stream().map(HDBOfficer::getName).toList();
-					writer.append("\"").append(String.join(",", officerNames)).append("\"")
-	                		.append("\n");
+					writer.append(String.join("|", officerNames))
+            		.append("\n");
 			 
 		        }
 		        System.out.print("\nProjects CSV File Updated");
