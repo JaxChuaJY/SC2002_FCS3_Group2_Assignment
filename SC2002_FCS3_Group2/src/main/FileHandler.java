@@ -5,6 +5,9 @@ import java.util.List;
 
 import interfaces.IFileHandler;
 
+/**
+ * Easy reference to read/write functions
+ */
 public class FileHandler implements IFileHandler{
 
 	/**
