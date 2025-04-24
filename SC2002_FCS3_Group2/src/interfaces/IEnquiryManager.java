@@ -20,8 +20,10 @@ public interface IEnquiryManager {
 
     void printAll();
 
-    boolean deleteCheck(int id);
+    boolean deleteCheck(Enquiry enquiry);
 
+    void deleteEnquiry(Enquiry enquiry);
+    
     void createEnquiryList(Enquiry enquiry);
 
     void loadFromCSV(String filename, IUserManager userManager, IProjectManager projectManager);
