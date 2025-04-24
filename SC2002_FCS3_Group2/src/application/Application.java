@@ -11,12 +11,30 @@ import user.Applicant;
  */
 public class Application {
 	
+	/**
+	 * The applicant who submitted the flat application.
+	 */
 	private Applicant applicant;
+
+	/**
+	 * The project associated with the flat application.
+	 */
 	private Project project;
+
+	/**
+	 * The type of flat applied for (e.g., 2-room, 3-room, 4-room, etc.).
+	 */
 	private FlatType flatType;
+
+	/**
+	 * The current status of the application (e.g., Submitted, Approved, Rejected).
+	 */
 	private ApplicationStatus status;
+
+	/**
+	 * The previous status of the application before the current one.
+	 */
 	private ApplicationStatus previousStatus;
-	
 	/**
      * Constructs a new Application with the specified details.
      *

@@ -114,6 +114,7 @@ public interface IApplicationManager {
      * Generates a report of applicant choices filtered by criteria.
      *
      * @param maritalStatus optional filter for marital status
+     * @param flatType optional filter for flat type
      * @param minAge optional minimum age filter
      * @param maxAge optional maximum age filter
      * @param projectName optional project name filter

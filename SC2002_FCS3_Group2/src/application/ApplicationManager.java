@@ -33,12 +33,19 @@ import user.User;
  */
 public class ApplicationManager implements IApplicationManager {
 
+	/** In-memory list of all application. */
 	private Map<String, Set<Application>> applicationList;
 
+	/** For managing project-related operations */
 	private IProjectManager projectManager;
+	
+	/** For managing user-related operations */
 	private IUserManager userManager;
+	
+	/** For managing file-related operations */
 	private IFileHandler fileHandler;
-
+	
+	/** File path for all applications. */
 	private static final String APPLICATIONS_FILE = "data/ApplicationList.csv";
 
 	/**
@@ -192,9 +199,8 @@ public class ApplicationManager implements IApplicationManager {
 	/**
 	 * Approves an application for a user and project. Reserves one flatType in the project.
 	 *
-	 * @param user    the applicant whose application is to be approved
-	 * @param project the project associated with the application
-	 * @throws IllegalArgumentException if the NRIC or project is null
+	 * @param application   the application to be approved
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	public void approveApplication(Application application) {
         if (application == null) {
@@ -212,9 +218,8 @@ public class ApplicationManager implements IApplicationManager {
 	/**
 	 * Rejects an application for a user and project.
 	 *
-	 * @param user    the applicant whose application is to be approved
-	 * @param project the project associated with the application
-	 * @throws IllegalArgumentException if the NRIC or project is null
+	 * @param application   the application to be rejected
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	@Override
 	public void rejectApplication(Application application) {
@@ -244,8 +249,8 @@ public class ApplicationManager implements IApplicationManager {
 	
 	/**
 	 * Rejects withdrawal of an application for a user.
-	 *
-	 * @param user the user requesting the withdrawal (must be an Applicant)
+	 * @param application   the withdrawal request to be rejected
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	@Override
 	public void rejectWithdrawal(Application application) {
@@ -260,8 +265,8 @@ public class ApplicationManager implements IApplicationManager {
 
 	/**
 	 * Requests withdrawal of an application for a user.
-	 *
-	 * @param user the user requesting the withdrawal (must be an Applicant)
+	 * @param application   the application to request withdrawal
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	@Override
 	public void requestWithdrawal(Application application) {
@@ -277,6 +282,7 @@ public class ApplicationManager implements IApplicationManager {
 	 * Books a flat for the applicant
 	 *
 	 * @param application the application used to book a flat
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	@Override
 	public void bookFlat(Application application) {
@@ -285,7 +291,13 @@ public class ApplicationManager implements IApplicationManager {
 		}
 		application.setStatus(ApplicationStatus.BOOKED);
 	}
-
+	
+	/**
+	 * prints receipt and stores
+	 *
+	 * @param application the application to print
+	 * @throws IllegalArgumentException if the application is null
+	 */
 	@Override
 	public void writeReceipt(Application application) {
 	    if (application == null) throw new IllegalArgumentException("Application cannot be null.");
@@ -311,6 +323,7 @@ public class ApplicationManager implements IApplicationManager {
 	 * View receipt of application
 	 *
 	 * @param application the application in question
+	 * @throws IllegalArgumentException if the application is null
 	 */
 	@Override
 	public void viewReceipt(Application application) {
